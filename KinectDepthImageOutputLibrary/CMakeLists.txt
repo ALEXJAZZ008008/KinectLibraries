@@ -1,6 +1,6 @@
 PROJECT(KinectDepthImageOutputLibrary VERSION 0.0 LANGUAGES CXX)
 
-target_link_libraries(KinectDepthImageOutputLibrary PUBLIC Qt5::Core) 
+target_link_libraries(KinectDepthImageOutputLibrary) 
 
 target_sources(KinectDepthImageOutputLibrary 
 	PRIVATE

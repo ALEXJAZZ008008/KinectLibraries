@@ -2,7 +2,7 @@
 #define KINECTDEPTHIMAGEOUTPUTWRAPPER_H
 
 #include <iostream>
-#include "kinectdepthimageoutputlibrary.h"
+#include "KinectDepthImageOutputLibrary/kinectdepthimageoutputlibrary.h"
 
 using namespace std;
 using namespace KinectDepthImageOutputLibrary;

@@ -1,9 +1,13 @@
 PROJECT(KinectMotorControlWrapper VERSION 0.0 LANGUAGES CXX)
 
-set(FREENECT_INCLUDE_DIR "default value" CACHE FILEPATH "description")
-set(FREENECT_LIBRARY "default value" CACHE FILEPATH "description")
+# # Find the Qt components
+find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
 
-include_directories(${FREENECT_INCLUDE_DIR})
+# # -- This is required in order to build QT elements
+ set(CMAKE_AUTOMOC ON)
+ set(CMAKE_AUTOUIC ON)
+ set(CMAKE_AUTORCC ON)
+ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_executable(${PROJECT_NAME} "${CMAKE_CURRENT_LIST_DIR}/main.cpp")
 
