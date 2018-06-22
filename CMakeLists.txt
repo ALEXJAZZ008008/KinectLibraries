@@ -52,6 +52,8 @@ if(DOWNLOAD_LibFreenect)
 		WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/libfreenect-download" )
 	add_subdirectory("${CMAKE_BINARY_DIR}/libfreenect-src" 
 		"${CMAKE_BINARY_DIR}/libfreenect-build")
+
+            set(Freenect_FOUND ON)
 endif()
 
 if(DOWNLOAD_LibFreenect2)
@@ -85,7 +87,10 @@ include_directories(KinectMotorControlWrapper)
 
 include(KinectDepthImageOutputLibrary/CMakeLists.txt)
 include(KinectDepthImageOutputWrapper/CMakeLists.txt)
-include(KinectMotorControlWrapper/CMakeLists.txt)
+
+if (Freenect_FOUND)
+    include(KinectMotorControlWrapper/CMakeLists.txt)
+endif()
 
 set(CONFIGURED_ONCE TRUE CACHE INTERNAL
      "A flag showing that CMake has configured at least once.")
