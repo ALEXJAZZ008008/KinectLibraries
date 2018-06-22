@@ -8,5 +8,4 @@ target_sources(KinectDepthImageOutputLibrary
     "${CMAKE_CURRENT_LIST_DIR}/kinectdepthimageoutputlibrary.h"
     ) 
 
-
 install(TARGETS KinectDepthImageOutputLibrary DESTINATION lib)

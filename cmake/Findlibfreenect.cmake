@@ -1,46 +1,45 @@
-# - Find the libfreenect includes and library
-# This module defines
-#  FREENECT_INCLUDE_DIR, path to libfreenect/libfreenect.h, etc.
-#  FREENECT_LIBRARIES, the libraries required to use FREENECT.
-#  FREENECT_FOUND, If false, do not try to use FREENECT.
-# also defined, but not for general use are
-#  FREENECT_freenect_LIBRARY, where to find the FREENECT library.
+# - Try to find libfreenect
+# Once done, this will define
+#
+#  Freenect_FOUND - system has libfreenect
+#  Freenect_INCLUDE_DIRS - the libfreenect include directories
+#  Freenect_LIBRARIES - link these to use libfreenect
 
-FIND_PATH(FREENECT_INCLUDE_DIR libfreenect.h
-  /usr/include/libfreenect
-  /usr/local/include
-  /usr/local/include/libfreenect
-  /usr/include
+include(LibFindMacros)
+
+# Use pkg-config to get hints about paths
+# libfind_pkg_check_modules(Freenect_PKGCONF libfreenect)
+
+# IF(NOT FREENECT_ROOT)
+#   IF(EXISTS "/usr/include/libfreenect")
+#     SET(FREENECT_ROOT "/usr")
+#   ELSEIF(EXISTS "/usr/local/include/libfreenect")
+#     SET(FREENECT_ROOT "/usr/local")
+#   ELSE()
+#     MESSAGE("FREENECT_ROOT not set. Continuing anyway..")
+#   ENDIF()
+# ENDIF()
+
+# Include dir
+find_path(Freenect_INCLUDE_DIR
+  NAMES libfreenect.h
+  PATHS ${FREENECT_ROOT}/include/libfreenect ${Freenect_PKGCONF_INCLUDE_DIRS}
 )
 
-FIND_LIBRARY(FREENECT_freenect_LIBRARY freenect
-  /usr/local/lib
-  /usr/lib
+# Finally the library itself
+find_library(Freenect_LIBRARY
+  NAMES freenect
+  PATHS ${FREENECT_ROOT}/lib ${Freenect_PKGCONF_LIBRARY_DIRS}
 )
 
-MARK_AS_ADVANCED(
-  FREENECT_INCLUDE_DIR
-  FREENECT_freenect_LIBRARY)
+find_library(FreenectSync_LIBRARY
+  NAMES freenect_sync
+  PATHS ${FREENECT_ROOT}/lib ${Freenect_PKGCONF_LIBRARY_DIRS}
+)
 
-SET( FREENECT_FOUND "NO" )
-
-IF(FREENECT_INCLUDE_DIR)
-  IF(FREENECT_freenect_LIBRARY)
-    SET( FREENECT_FOUND "YES" )
-    SET( FREENECT_LIBRARIES
-      ${FREENECT_freenect_LIBRARY})
-  ENDIF(FREENECT_freenect_LIBRARY)
-ENDIF(FREENECT_INCLUDE_DIR)
-
-IF(FREENECT_FOUND)
-  MESSAGE(STATUS "Found freenect library")
-ELSE()
-  IF(FREENECT_FIND_REQUIRED)
-    MESSAGE(STATUS "Could not find libfreenect 
--- please give some paths to CMake or make sure libfreenect is installed in your system")
-  ELSE(FREENECT_FIND_REQUIRED)
-    MESSAGE(STATUS "Could not find libfreenect 
--- please give some paths to CMake or make sure libfreenect is installed in your system")
-  ENDIF(FREENECT_FIND_REQUIRED)
-ENDIF(FREENECT_FOUND)
+# Set the include dir variables and the libraries and let libfind_process do the rest.
+# NOTE: Singular variables for this library, plural for libraries this this lib depends on.
+set(Freenect_PROCESS_INCLUDES Freenect_INCLUDE_DIR Freenect_INCLUDE_DIRS)
+set(Freenect_PROCESS_LIBS FreenectSync_LIBRARY Freenect_LIBRARY Freenect_LIBRARIES)
+libfind_process(Freenect)
  
