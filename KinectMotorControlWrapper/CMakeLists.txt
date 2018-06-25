@@ -9,8 +9,8 @@ target_link_libraries(${PROJECT_NAME} Qt5::Core Qt5::Widgets Qt5::Gui KinectDept
  target_sources(KinectMotorControlWrapper
     PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/KinectMotorControlWrapper.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/KinectMotorControlWrapper.h"
         "${CMAKE_CURRENT_LIST_DIR}/motor_control.ui"
+        "${CMAKE_CURRENT_LIST_DIR}/KinectMotorControlWrapper.h"
         )
 
 

@@ -1,5 +1,7 @@
 PROJECT(KinectDepthImageOutputLibrary VERSION 0.0 LANGUAGES CXX)
 
+add_library(KinectDepthImageOutputLibrary ${CMAKE_CURRENT_LIST_DIR})
+
 target_link_libraries(KinectDepthImageOutputLibrary) 
 
 target_sources(KinectDepthImageOutputLibrary 

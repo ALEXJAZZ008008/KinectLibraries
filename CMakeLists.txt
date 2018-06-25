@@ -34,7 +34,7 @@ endif()
 # or we will download them from git. 
 if (NOT LOCAL_LIBFREENECT)
 	if(NOT DOWNLOAD_LibFreenect AND NOT DOWNLOAD_LibFreenect2)
-		message(SEND_ERROR "${PROJECT_NAME} depends on libfreenect. You must either have it installed locally or download them.")
+                message(SEND_ERROR "${PROJECT_NAME} depends on libfreenect. You must either have it installed locally or download them.")
 	endif()
 else()
 	set(FREENECT_ROOT "" CACHE PATH "Root path of libfreenect.")
@@ -80,15 +80,14 @@ find_package(Threads REQUIRED)
  set(CMAKE_AUTORCC ON)
  set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-add_library(KinectDepthImageOutputLibrary "")
+# add_library(KinectDepthImageOutputLibrary "")
 
 include_directories(KinectDepthImageOutputLibrary)
 include_directories(KinectMotorControlWrapper)
 
-include(KinectDepthImageOutputLibrary/CMakeLists.txt)
-include(KinectDepthImageOutputWrapper/CMakeLists.txt)
-
 if (Freenect_FOUND)
+	include(KinectDepthImageOutputLibrary/CMakeLists.txt)
+	include(KinectDepthImageOutputWrapper/CMakeLists.txt)
     include(KinectMotorControlWrapper/CMakeLists.txt)
 endif()
 
