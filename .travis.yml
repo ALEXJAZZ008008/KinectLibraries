@@ -9,7 +9,7 @@ matrix:
  include:
    #### linux
  - os: linux
-   env: EXTRA_BUILD_FLAGS="-DDISABLE_CERN_ROOT=0 -DSTIR_OPENMP:BOOL=OFF" CC=gcc-5 CXX=g++-5
+   env: EXTRA_BUILD_FLAGS="-DDOWNLOAD_LibFreenect=ON -DBUILD_DOC=OFF" CC=gcc-5 CXX=g++-5
 
    ####  osx
    # note: cannot use OpenMP on OSX yet, see https://github.com/UCL/STIR/issues/117
