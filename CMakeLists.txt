@@ -11,6 +11,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 option(DOWNLOAD_LibFreenect "Downlaod the Freenect libraries v.1" OFF)
 option(DOWNLOAD_LibFreenect2 "Downlaod the Freenect libraries v.2" OFF)
 option(LOCAL_LIBFREENECT "Use Local Freect libraries" OFF)
+option(BUILD_DOC "Build documentation" ON)
 # option(ENABLE_QT "Enables the QT interface" OFF)
 
 ############################  Options: Build How?  #############################
@@ -75,6 +76,29 @@ find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
 # freezing the system.
 find_package(Threads REQUIRED)
 
+# For building the documentation only in Release mode.
+if (CMAKE_BUILD_TYPE MATCHES "^[Rr]elease")
+	find_package(Doxygen)
+	if (DOXYGEN_FOUND)
+		# set input and output files
+    	set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in)
+    	set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+
+    	# request to configure the file
+    	configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+    	message("Doxygen build started")
+
+    	# note the option ALL which allows to build the docs together with the application
+    	add_custom_target( doc_doxygen ALL
+	        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+    	    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        	COMMENT "Generating API documentation with Doxygen"
+        	VERBATIM )
+	else (DOXYGEN_FOUND)
+  		message("Doxygen need to be installed to generate the doxygen documentation")
+	endif()
+endif()
+
  set(CMAKE_AUTOMOC ON)
  set(CMAKE_AUTOUIC ON)
  set(CMAKE_AUTORCC ON)
@@ -82,13 +106,11 @@ find_package(Threads REQUIRED)
 
 # add_library(KinectDepthImageOutputLibrary "")
 
-include_directories(KinectDepthImageOutputLibrary)
-include_directories(KinectMotorControlWrapper)
+include_directories(src/include)
+# include_directories(src/KinectMotorControlWrapper)
 
 if (Freenect_FOUND)
-	include(KinectDepthImageOutputLibrary/CMakeLists.txt)
-	include(KinectDepthImageOutputWrapper/CMakeLists.txt)
-    include(KinectMotorControlWrapper/CMakeLists.txt)
+	include(src/CMakeLists.txt)
 endif()
 
 set(CONFIGURED_ONCE TRUE CACHE INTERNAL

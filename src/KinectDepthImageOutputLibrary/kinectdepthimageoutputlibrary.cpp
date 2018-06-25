@@ -1,4 +1,4 @@
-#include "kinectdepthimageoutputlibrary.h"
+#include "src/include/kinectdepthimageoutputlibrary.h"
 
 namespace KinectDepthImageOutputLibrary
 {

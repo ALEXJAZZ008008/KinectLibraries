@@ -8,7 +8,7 @@ target_link_libraries(${PROJECT_NAME} Qt5::Core KinectDepthImageOutputLibrary ${
  target_sources(KinectDepthImageOutputWrapper
     PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/kinectdepthimageoutputwrapper.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/kinectdepthimageoutputwrapper.h"
+        # "${CMAKE_CURRENT_LIST_DIR}/kinectdepthimageoutputwrapper.h"
         )
 
 

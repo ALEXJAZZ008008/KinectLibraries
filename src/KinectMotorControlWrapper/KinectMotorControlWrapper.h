@@ -23,16 +23,19 @@ class motor_control;
 //! Finds and connects to a Kinect camera.
 //! I case of multiple connected cameras, only the first
 //! will be considered.
+//! \details The class is a singleton. Which means that only a single object across
+//! the application life span, can exist.
 //!
 class MotorControl : public QDialog
 {
     Q_OBJECT
 
 public:
-
+    //! Return a static reference to the singleton object.
     static MotorControl &getInstance( );
 
     MotorControl(MotorControl &) = delete;
+
     void operator = (MotorControl &) = delete;
 
     inline Ui::motor_control * get_ui() const
@@ -55,11 +58,10 @@ private:
 
     //! Current tilt state.
     freenect_raw_tilt_state *m_current_tilt_state_ptr;
-
+    //! Controls the frequency of checking the output of the camera
     QTimer *m_update_ptr;
-
+    //! Step of camera tilt.
     double m_increment;
-
     //! Number of devices connected to the PC.
     int m_num_devices;
 
