@@ -35,7 +35,7 @@ endif()
 # or we will download them from git. 
 if (NOT LOCAL_LIBFREENECT)
 	if(NOT DOWNLOAD_LibFreenect AND NOT DOWNLOAD_LibFreenect2)
-                message(SEND_ERROR "${PROJECT_NAME} depends on libfreenect. You must either have it installed locally or download them.")
+                message(STATUS "${PROJECT_NAME} depends on libfreenect. You must either have it installed locally or download them.")
 	endif()
 else()
 	set(FREENECT_ROOT "" CACHE PATH "Root path of libfreenect.")
@@ -54,7 +54,19 @@ if(DOWNLOAD_LibFreenect)
 	add_subdirectory("${CMAKE_BINARY_DIR}/libfreenect-src" 
 		"${CMAKE_BINARY_DIR}/libfreenect-build")
 
-            set(Freenect_FOUND ON)
+        INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR}/libfreenect-src/include)
+        # Finally the library itself
+        find_library(Freenect_LIBRARY
+          NAMES freenect
+          PATHS ${CMAKE_BINARY_DIR}/libfreenect-src/lib ${Freenect_PKGCONF_LIBRARY_DIRS}
+        )
+
+        find_library(FreenectSync_LIBRARY
+          NAMES freenect_sync
+          PATHS ${CMAKE_BINARY_DIR}/libfreenect-src/lib ${Freenect_PKGCONF_LIBRARY_DIRS}
+        )
+
+        set(Freenect_FOUND ON)
 endif()
 
 if(DOWNLOAD_LibFreenect2)

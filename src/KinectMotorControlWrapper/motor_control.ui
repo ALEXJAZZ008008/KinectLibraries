@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>286</width>
+    <width>288</width>
     <height>338</height>
    </rect>
   </property>
@@ -39,7 +39,8 @@
         <string>Up</string>
        </property>
        <property name="icon">
-        <iconset theme="go-up"/>
+        <iconset theme="go-up">
+         <normaloff>.</normaloff>.</iconset>
        </property>
       </widget>
      </item>
@@ -49,7 +50,8 @@
         <string>Down</string>
        </property>
        <property name="icon">
-        <iconset theme="go-down"/>
+        <iconset theme="go-down">
+         <normaloff>.</normaloff>.</iconset>
        </property>
       </widget>
      </item>
@@ -59,7 +61,8 @@
         <string>Info</string>
        </property>
        <property name="icon">
-        <iconset theme="dialog-information"/>
+        <iconset theme="dialog-information">
+         <normaloff>.</normaloff>.</iconset>
        </property>
       </widget>
      </item>

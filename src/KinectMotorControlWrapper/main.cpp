@@ -8,8 +8,8 @@ int main(int argc, char *argv[])
     a.setApplicationName("KinectMotorTest");
     a.setApplicationVersion(QObject::tr("0.0.1"));
 
-    MotorControl::getInstance().show();
-
+    KinectFrontend kinect_frontend;
+    kinect_frontend.show();
 
     return a.exec();
 }
