@@ -116,10 +116,10 @@ endif()
  set(CMAKE_AUTORCC ON)
  set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-# add_library(KinectDepthImageOutputLibrary "")
+# add_library(KinectBackend "")
 
 include_directories(src/include)
-# include_directories(src/KinectMotorControlWrapper)
+# include_directories(src/KinectFrontend)
 
 if (Freenect_FOUND)
 	include(src/CMakeLists.txt)

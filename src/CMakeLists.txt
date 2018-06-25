@@ -1,2 +1,3 @@
-include(src/KinectDepthImageOutputLibrary/CMakeLists.txt)
-include(src/KinectMotorControlWrapper/CMakeLists.txt) 
+include(src/KinectBackend/CMakeLists.txt)
+include(src/KinectOpenGL/CMakeLists.txt)
+include(src/KinectFrontend/CMakeLists.txt) 

@@ -1,9 +1,10 @@
-#ifndef KINECTDEPTHIMAGEOUTPUTLIBRARY_H
-#define KINECTDEPTHIMAGEOUTPUTLIBRARY_H
+#ifndef KINECTBACKEND_H
+#define KINECTBACKEND_H
 
 #include <string>
 
 #include "libfreenect.h"
+#include "KinectOpenGL.h"
 
 using namespace std;
 
@@ -19,6 +20,7 @@ using namespace std;
 class KinectBackend
 {
 public:
+
     //! Return a static reference to the singleton object.
     static KinectBackend &getInstance( );
 
@@ -27,15 +29,10 @@ public:
     KinectBackend(KinectBackend &&) = delete;
     void operator = (KinectBackend &&) = delete;
 
+    int update();
+
     //! Create connections
-    int create_connections();
-
-    inline double get_camera_tilt()
-    {
-        return m_camera_tilt;
-    }
-
-    int set_camera_tilt(double);
+    int kinect_backend_main();
 
     string get_output();
 
@@ -77,6 +74,13 @@ public:
         return 0;
     }
 
+    inline double get_camera_tilt()
+    {
+        return m_camera_tilt;
+    }
+
+    int set_camera_tilt(double);
+
 private:
 
     explicit KinectBackend();
@@ -116,4 +120,4 @@ private:
     int set_current_camera_tilt(double);
 };
 
-#endif // KINECTDEPTHIMAGEOUTPUTLIBRARY_H
+#endif // KINECTBACKEND_H
