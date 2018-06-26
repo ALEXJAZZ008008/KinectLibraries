@@ -1,6 +1,15 @@
 #include "src/include/KinectBackend.h"
 
-KinectBackend::KinectBackend(): m_fctx_ptr(nullptr), m_fdev_ptr(nullptr), m_current_tilt_state_ptr(nullptr), m_output(""), m_depth_output(""), m_video_output(""), m_camera_tilt(0.0), m_increment(2.0), m_num_devices(0)
+KinectBackend::KinectBackend():
+    m_fctx_ptr(nullptr),
+    m_fdev_ptr(nullptr),
+    m_current_tilt_state_ptr(nullptr),
+    m_output(""),
+    m_depth_output(""),
+    m_video_output(""),
+    m_stored_camera_tilt(0.0),
+    m_increment(2.0),
+    m_num_devices(0)
 {
 
 }
@@ -92,7 +101,7 @@ int KinectBackend::kinect_backend_main()
         return -1;
     }
 
-    set_current_camera_tilt(0.0);
+    set_device_camera_tilt(0.0);
 
     freenect_set_led(m_fdev_ptr, LED_RED);
 
@@ -103,6 +112,8 @@ int KinectBackend::kinect_backend_main()
 
 int KinectBackend::kinect_backend_kill()
 {
+    set_device_camera_tilt(0.0);
+
     destructor();
 
     return 1;
@@ -165,13 +176,13 @@ int KinectBackend::destructor()
     return 1;
 }
 
-int KinectBackend::set_camera_tilt(double increment)
+int KinectBackend::set_stored_camera_tilt(double increment)
 {
     update_tilt_state();
 
     freenect_tilt_status_code tilt_state = freenect_get_tilt_status(m_current_tilt_state_ptr);
 
-    double current_camera_tilt = get_current_camera_tilt();
+    double current_camera_tilt = get_device_camera_tilt();
 
     switch(tilt_state)
     {
@@ -187,7 +198,7 @@ int KinectBackend::set_camera_tilt(double increment)
         {
             if(increment < 0)
             {
-                set_current_camera_tilt(current_camera_tilt + (m_increment * increment));
+                set_device_camera_tilt(current_camera_tilt + (m_increment * increment));
             }
             else
             {
@@ -198,7 +209,7 @@ int KinectBackend::set_camera_tilt(double increment)
         {
             if(increment > 0)
             {
-                set_current_camera_tilt(current_camera_tilt + (m_increment * increment));
+                set_device_camera_tilt(current_camera_tilt + (m_increment * increment));
             }
             else
             {
@@ -210,7 +221,7 @@ int KinectBackend::set_camera_tilt(double increment)
 
     case freenect_tilt_status_code::TILT_STATUS_STOPPED:
 
-        set_current_camera_tilt(current_camera_tilt + (m_increment * increment));
+        set_device_camera_tilt(current_camera_tilt + (m_increment * increment));
 
         return 1;
 
@@ -218,7 +229,7 @@ int KinectBackend::set_camera_tilt(double increment)
 
         m_output += "Unable to tilt the camera!!\n";
 
-        set_current_camera_tilt(0.0);
+        set_device_camera_tilt(0.0);
 
         return -1;
     }
@@ -227,7 +238,7 @@ int KinectBackend::set_camera_tilt(double increment)
 }
 
 void KinectBackend::depth_callback(freenect_device *fdev_ptr, void *data, unsigned int timestamp)
-{
+{    
     KinectBackend::getInstance().append_depth_output("Received depth frame at " + to_string(timestamp) + "\n");
 }
 
@@ -250,20 +261,20 @@ int KinectBackend::update_tilt_state()
     return 1;
 }
 
-double KinectBackend::get_current_camera_tilt()
+double KinectBackend::get_device_camera_tilt()
 {
     return freenect_get_tilt_degs(m_current_tilt_state_ptr);
 }
 
-int KinectBackend::set_current_camera_tilt(double new_camera_tilt)
+int KinectBackend::set_device_camera_tilt(double new_camera_tilt)
 {
     if(new_camera_tilt < 25.0 && new_camera_tilt > -25.0)
     {
         freenect_set_tilt_degs(m_fdev_ptr, new_camera_tilt);
 
-        m_camera_tilt = new_camera_tilt;
+        m_stored_camera_tilt = new_camera_tilt;
 
-        m_output += "Camera tilted to: " + to_string(m_camera_tilt) + "\n";
+        m_output += "Camera tilted to: " + to_string(m_stored_camera_tilt) + "\n";
     }
     else
     {
