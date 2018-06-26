@@ -5,8 +5,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QLabel>
-
-#include <pthread.h>
+#include <QTimer>
 
 #include "ui_motor_control.h"
 #include "KinectBackend.h"
@@ -24,8 +23,6 @@ class motor_control;
 //! Finds and connects to a Kinect camera.
 //! I case of multiple connected cameras, only the first
 //! will be considered.
-//! \details The class is a singleton. Which means that only a single object across
-//! the application life span, can exist.
 //!
 class KinectFrontend : public QDialog
 {
@@ -33,31 +30,32 @@ class KinectFrontend : public QDialog
 
 public:
 
-    //! Return a static reference to the singleton object.
-    static KinectFrontend &getInstance( );
-
-    KinectFrontend(KinectFrontend &) = delete;
-    void operator = (KinectFrontend &) = delete;
-    KinectFrontend(KinectFrontend &&) = delete;
-    void operator = (KinectFrontend &&) = delete;
-
-private:
-
-    //! Return a static reference to the singleton object.
     explicit KinectFrontend(QDialog *parent = 0);
     ~KinectFrontend();
 
+    KinectFrontend(KinectFrontend &);
+    void operator = (KinectFrontend &);
+    KinectFrontend(KinectFrontend &&);
+    void operator = (KinectFrontend &&);
+
+private:
+
     Ui::motor_control *m_ui_ptr;
 
-    pthread_t m_update;
+    QTimer *m_update;
 
-    static void * update(void *);
+    int destructor();
+    int update_output();
 
 signals:
 
 private slots:
 
+    void update();
+
     void on__psh_connect_clicked();
+
+    void on__psh_disconnect_clicked();
 
     void on_pushButton_clicked();
 

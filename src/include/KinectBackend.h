@@ -4,7 +4,6 @@
 #include <string>
 
 #include "libfreenect.h"
-#include "KinectOpenGL.h"
 
 using namespace std;
 
@@ -34,12 +33,11 @@ public:
     //! Create connections
     int kinect_backend_main();
 
+    int kinect_backend_kill();
+
     string get_output();
 
-    inline string get_depth_output()
-    {
-        return m_depth_output;
-    }
+    string get_depth_output();
 
     inline int append_depth_output(string depth_output)
     {
@@ -48,28 +46,11 @@ public:
         return 0;
     }
 
-    inline int set_depth_output(string depth_output)
-    {
-        m_depth_output = depth_output;
-
-        return 0;
-    }
-
-    inline string get_video_output()
-    {
-        return m_video_output;
-    }
+    string get_video_output();
 
     inline int append_video_output(string video_output)
     {
         m_video_output += video_output;
-
-        return 0;
-    }
-
-    inline int set_video_output(string video_output)
-    {
-        m_video_output = video_output;
 
         return 0;
     }
@@ -115,6 +96,7 @@ private:
     static void depth_callback(freenect_device *, void *, unsigned int);
     static void video_callback(freenect_device *, void *, unsigned int);
 
+    int destructor();
     int update_tilt_state();
     double get_current_camera_tilt();
     int set_current_camera_tilt(double);
