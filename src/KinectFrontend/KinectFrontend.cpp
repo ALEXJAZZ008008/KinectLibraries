@@ -63,9 +63,6 @@ void KinectFrontend::on__psh_connect_clicked()
 
         connect(m_update, SIGNAL(timeout()), this, SLOT(update()));
         m_update->start(33);
-    }
-    else
-    {
         is_connected = true;
     }
 
