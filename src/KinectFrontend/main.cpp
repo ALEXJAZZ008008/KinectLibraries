@@ -1,11 +1,11 @@
 #include <QApplication>
-#include "KinectMotorControlWrapper.h"
+#include "KinectFrontend.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    a.setApplicationName("KinectMotorTest");
+    a.setApplicationName("KinectFrontend");
     a.setApplicationVersion(QObject::tr("0.0.1"));
 
     KinectFrontend kinect_frontend;
