@@ -12,6 +12,7 @@ option(DOWNLOAD_LibFreenect "Downlaod the Freenect libraries v.1" OFF)
 option(DOWNLOAD_LibFreenect2 "Downlaod the Freenect libraries v.2" OFF)
 option(LOCAL_LIBFREENECT "Use Local Freect libraries" OFF)
 option(BUILD_DOC "Build documentation" ON)
+option(BUILD_TESTS "Build tests" ON)
 # option(ENABLE_QT "Enables the QT interface" OFF)
 
 ############################  Options: Build How?  #############################
@@ -123,6 +124,11 @@ include_directories(src/include)
 
 if (Freenect_FOUND)
 	include(src/CMakeLists.txt)
+endif()
+
+if (BUILD_TESTS)
+        enable_testing ()
+	include(src/test/CMakeLists.txt)
 endif()
 
 set(CONFIGURED_ONCE TRUE CACHE INTERNAL
