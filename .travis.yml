@@ -38,7 +38,7 @@ addons:
     sources:
       - llvm-toolchain-trusty-5.0
     packages:
-      - libusb-1.0-0
+      - libusb-1.0-0-dev
       - qtbase5-dev
 
 # Actual compilation script
