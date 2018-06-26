@@ -13,8 +13,7 @@ matrix:
 
    ####  osx
  - os: osx
-   python: 3
-   env: EXTRA_BUILD_FLAGS="-DOWNLOAD_LibFreenect=1" CC=gcc CXX=g++
+   env: EXTRA_BUILD_FLAGS="-DOWNLOAD_LibFreenect=ON -DBUILD_DOC=OFF" CC=gcc CXX=g++
 
 env:
   global:
@@ -49,7 +48,7 @@ before_install:
       brew install ccache
       export PATH="/usr/local/opt/ccache/libexec:$PATH"
       brew install libusb
-      brew install freeglutW
+      brew install freeglut
       brew install qt5
     fi   
       
