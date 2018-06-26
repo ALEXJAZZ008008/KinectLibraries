@@ -15,10 +15,6 @@ matrix:
  - os: osx
    python: 3
    env: EXTRA_BUILD_FLAGS="-DOWNLOAD_LibFreenect=1" CC=gcc CXX=g++
- - os: osx
-   osx_image: xcode9 # need that for ROOT
-   python: 3
-   env: EXTRA_BUILD_FLAGS="-DOWNLOAD_LibFreenect" CC=gcc CXX=g++
 
 env:
   global:
@@ -42,11 +38,25 @@ addons:
       - qtbase5-dev
 
 # Actual compilation script
+
+before_install:
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then 
+      brew update
+      # seems to be needed on Travis due to conflicts with gcc otherwise
+      # see https://github.com/travis-ci/travis-ci/issues/8826
+      brew cask uninstall oclint
+      brew install ccache
+      export PATH="/usr/local/opt/ccache/libexec:$PATH"
+      brew install libusb
+      brew install freeglutW
+      brew install qt5
+    fi   
       
 install:
   - mkdir build install
   - cd build
   - cmake $BUILD_FLAGS $EXTRA_BUILD_FLAGS -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/install ..
-  
+
 script:
   - make -j 2
