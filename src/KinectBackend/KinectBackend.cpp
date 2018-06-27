@@ -1,4 +1,6 @@
 #include "src/include/KinectBackend.h"
+#include <iostream>
+#include <fstream>
 
 KinectBackend::KinectBackend():
     m_fctx_ptr(nullptr),
@@ -325,47 +327,60 @@ void KinectBackend::depth_callback(freenect_device *fdev_ptr, void *data, unsign
 
 void KinectBackend::video_callback(freenect_device *fdev_ptr, void *data_ptr, unsigned int timestamp)
 {
-    unsigned char *video_ptr = static_cast<unsigned char *>(data_ptr);
+    ofstream myfile;
+    myfile.open("nikos.bin", ios::out | ios::binary);
 
-    KinectBackend::getInstance().append_video_output("[");
+    uint8_t *video_ptr = static_cast<uint8_t *>(data_ptr);
 
-    for(int i = 0; i < 640; i++)
-    {
-        KinectBackend::getInstance().append_video_output("[");
-
-        for(int j = 0; j < 480; j++)
+    for(int i = 0; i < 640*480; i++)
+//        for(int j = 0; j < 480; j++)
         {
-            KinectBackend::getInstance().m_video[i][j][0] = video_ptr[3 * i * j + 0];
-            KinectBackend::getInstance().m_video[i][j][1] = video_ptr[3 * i * j + 1];
-            KinectBackend::getInstance().m_video[i][j][2] = video_ptr[3 * i * j + 2];
-
-            KinectBackend::getInstance().append_video_output("[" + to_string(KinectBackend::getInstance().m_video[i][j][0]) + ", " +
-                    to_string(KinectBackend::getInstance().m_video[i][j][1]) + ", " +
-                    to_string(KinectBackend::getInstance().m_video[i][j][2]));
-
-            if(j < 479)
-            {
-                KinectBackend::getInstance().append_video_output("],\n");
-            }
-            else
-            {
-                KinectBackend::getInstance().append_video_output("]");
-            }
+            myfile.write(reinterpret_cast<char*>(&video_ptr[3 * i]), sizeof(uint8_t));
         }
 
-        if(i < 639)
-        {
-            KinectBackend::getInstance().append_video_output("],\n");
-        }
-        else
-        {
-            KinectBackend::getInstance().append_video_output("]");
-        }
-    }
+    myfile.close();
 
-    KinectBackend::getInstance().append_video_output("]\n");
 
-    KinectBackend::getInstance().append_video_output("Received video frame at "  + to_string(timestamp) + "\n");
+
+//    KinectBackend::getInstance().append_video_output("[");
+
+//    for(int i = 0; i < 640; i++)
+//    {
+//        KinectBackend::getInstance().append_video_output("[");
+
+//        for(int j = 0; j < 480; j++)
+//        {
+//            KinectBackend::getInstance().m_video[i][j][0] = video_ptr[3 * i * j + 0];
+//            KinectBackend::getInstance().m_video[i][j][1] = video_ptr[3 * i * j + 1];
+//            KinectBackend::getInstance().m_video[i][j][2] = video_ptr[3 * i * j + 2];
+
+//            KinectBackend::getInstance().append_video_output("[" + to_string(KinectBackend::getInstance().m_video[i][j][0]) + ", " +
+//                    to_string(KinectBackend::getInstance().m_video[i][j][1]) + ", " +
+//                    to_string(KinectBackend::getInstance().m_video[i][j][2]));
+
+//            if(j < 479)
+//            {
+//                KinectBackend::getInstance().append_video_output("],\n");
+//            }
+//            else
+//            {
+//                KinectBackend::getInstance().append_video_output("]");
+//            }
+//        }
+
+//        if(i < 639)
+//        {
+//            KinectBackend::getInstance().append_video_output("],\n");
+//        }
+//        else
+//        {
+//            KinectBackend::getInstance().append_video_output("]");
+//        }
+//    }
+
+//    KinectBackend::getInstance().append_video_output("]\n");
+
+//    KinectBackend::getInstance().append_video_output("Received video frame at "  + to_string(timestamp) + "\n");
 }
 
 int KinectBackend::update_tilt_state()
