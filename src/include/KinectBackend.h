@@ -98,7 +98,7 @@ private:
     //! Current tilt state.
     freenect_raw_tilt_state *m_current_tilt_state_ptr;
 
-    unsigned char *m_depth_ptr;
+    unsigned char m_depth[640 * 480 * 3];
 
     unsigned char *m_video_ptr;
 

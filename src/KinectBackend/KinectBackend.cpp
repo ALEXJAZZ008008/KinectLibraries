@@ -4,7 +4,7 @@ KinectBackend::KinectBackend():
     m_fctx_ptr(nullptr),
     m_fdev_ptr(nullptr),
     m_current_tilt_state_ptr(nullptr),
-    m_depth_ptr((unsigned char *)new unsigned char[640 * 480 * 3]),
+    m_depth(),
     m_video_ptr((unsigned char *)new unsigned char[640 * 480 * 3]),
     m_gamma(),
     m_output(""),
@@ -180,16 +180,9 @@ int KinectBackend::destructor()
         m_current_tilt_state_ptr = nullptr;
     }
 
-    if(m_depth_ptr != nullptr)
-    {
-        delete[] m_depth_ptr;
-
-        m_depth_ptr = nullptr;
-    }
-
     if(m_video_ptr != nullptr)
     {
-        delete[] m_video_ptr;
+        //delete[] m_video_ptr;
 
         m_video_ptr = nullptr;
     }
@@ -274,64 +267,64 @@ void KinectBackend::depth_callback(freenect_device *fdev_ptr, void *data, unsign
         {
         case 0:
 
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 0] = 255;
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 1] = 255 - lb;
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 2] = 255 - lb;
+            KinectBackend::getInstance().m_depth[3 * i + 0] = 255;
+            KinectBackend::getInstance().m_depth[3 * i + 1] = 255 - lb;
+            KinectBackend::getInstance().m_depth[3 * i + 2] = 255 - lb;
 
             break;
 
         case 1:
 
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 0] = 255;
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 1] = lb;
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 2] = 0;
+            KinectBackend::getInstance().m_depth[3 * i + 0] = 255;
+            KinectBackend::getInstance().m_depth[3 * i + 1] = lb;
+            KinectBackend::getInstance().m_depth[3 * i + 2] = 0;
 
             break;
 
         case 2:
 
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 0] = 255 - lb;
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 1] = 255;
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 2] = 0;
+            KinectBackend::getInstance().m_depth[3 * i + 0] = 255 - lb;
+            KinectBackend::getInstance().m_depth[3 * i + 1] = 255;
+            KinectBackend::getInstance().m_depth[3 * i + 2] = 0;
 
             break;
 
         case 3:
 
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 0] = 0;
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 1] = 255;
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 2] = lb;
+            KinectBackend::getInstance().m_depth[3 * i + 0] = 0;
+            KinectBackend::getInstance().m_depth[3 * i + 1] = 255;
+            KinectBackend::getInstance().m_depth[3 * i + 2] = lb;
 
             break;
 
         case 4:
 
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 0] = 0;
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 1] = 255 - lb;
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 2] = 255;
+            KinectBackend::getInstance().m_depth[3 * i + 0] = 0;
+            KinectBackend::getInstance().m_depth[3 * i + 1] = 255 - lb;
+            KinectBackend::getInstance().m_depth[3 * i + 2] = 255;
 
             break;
 
         case 5:
 
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 0] = 0;
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 1] = 0;
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 2] = 255 - lb;
+            KinectBackend::getInstance().m_depth[3 * i + 0] = 0;
+            KinectBackend::getInstance().m_depth[3 * i + 1] = 0;
+            KinectBackend::getInstance().m_depth[3 * i + 2] = 255 - lb;
 
             break;
 
         default:
 
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 0] = 0;
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 1] = 0;
-            KinectBackend::getInstance().m_depth_ptr[3 * i + 2] = 0;
+            KinectBackend::getInstance().m_depth[3 * i + 0] = 0;
+            KinectBackend::getInstance().m_depth[3 * i + 1] = 0;
+            KinectBackend::getInstance().m_depth[3 * i + 2] = 0;
 
             break;
         }
 
-        //KinectBackend::getInstance().append_depth_output(to_string(KinectBackend::getInstance().m_depth_ptr[3 * i + 0]) + " " +
-        //        to_string(KinectBackend::getInstance().m_depth_ptr[3 * i + 1]) + " " +
-        //        to_string(KinectBackend::getInstance().m_depth_mid_ptr[3 * i + 2]) + "\n");
+        KinectBackend::getInstance().append_depth_output(to_string(KinectBackend::getInstance().m_depth[3 * i + 0]) + " " +
+                to_string(KinectBackend::getInstance().m_depth[3 * i + 1]) + " " +
+                to_string(KinectBackend::getInstance().m_depth[3 * i + 2]) + "\n");
 
         //KinectBackend::getInstance().append_video_output(to_string(KinectBackend::getInstance().m_video_ptr[3 * i + 0]) + " " +
         //        to_string(KinectBackend::getInstance().m_video_ptr[3 * i + 1]) + " " +
