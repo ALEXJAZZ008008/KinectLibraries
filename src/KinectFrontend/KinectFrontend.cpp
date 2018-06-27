@@ -34,7 +34,7 @@ int KinectFrontend::destructor()
 int KinectFrontend::update_output()
 {
     m_ui_ptr->_lbl_output_msg->insertPlainText(KinectBackend::getInstance().get_depth_output().c_str());
-    //m_ui_ptr->_lbl_output_msg->insertPlainText(KinectBackend::getInstance().get_video_output().c_str());
+    m_ui_ptr->_lbl_output_msg->insertPlainText(KinectBackend::getInstance().get_video_output().c_str());
 
     m_ui_ptr->_lbl_output_msg->insertPlainText(KinectBackend::getInstance().get_output().c_str());
 

@@ -98,12 +98,11 @@ private:
     //! Current tilt state.
     freenect_raw_tilt_state *m_current_tilt_state_ptr;
 
-    uint8_t *m_depth_mid_ptr;
+    unsigned char *m_depth_ptr;
 
-    uint8_t *m_rgb_back_ptr;
-    uint8_t *m_rgb_mid_ptr;
+    unsigned char *m_video_ptr;
 
-    uint16_t m_gamma[2048];
+    unsigned short m_gamma[2048];
 
     //! General output
     string m_output;
