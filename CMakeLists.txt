@@ -9,20 +9,33 @@ set (CMAKE_CXX_STANDARD 11)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
-# Find the Qt components
-find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
-
-# Threads are used in the LibFreenect sync library and
-# we might use them too, in order to acquire data without
-# freezing the system.
-find_package(Threads REQUIRED)
-
 ############################  Options: Build What?  ############################
 option(DOWNLOAD_LibFreenect "Downlaod the Freenect libraries v.1" OFF)
 option(DOWNLOAD_LibFreenect2 "Downlaod the Freenect libraries v.2" OFF)
 option(LOCAL_LIBFREENECT "Use Local Freect libraries" OFF)
 option(BUILD_DOC "Build documentation" ON)
 # option(ENABLE_QT "Enables the QT interface" OFF)
+
+if(UNIX)
+# Find the Qt components
+find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
+endif()
+
+# Threads are used in the LibFreenect sync library and
+# we might use them too, in order to acquire data without
+# freezing the system.
+find_package(Threads REQUIRED)
+
+if(APPLE AND EXISTS /usr/local/opt/qt5)
+    # Homebrew installs Qt5 (up to at least 5.9.1) in
+    # /usr/local/qt5, ensure it can be found by CMake since
+    # it is not in the default /usr/local prefix.
+    list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/qt5")
+endif()
+
+if(WIN32 AND EXISTS ${QTDIR})
+    list(APPEND CMAKE_PREFIX_PATH "${QTDIR}")
+endif()
 
 ############################  Options: Build How?  #############################
 include(commons)
@@ -78,10 +91,10 @@ if((${CMAKE_CXX_COMPILER_ID} MATCHES "AppleClang") OR
         configure_file(${CMAKE_MODULE_PATH}/libfreenect.txt.in libfreenect-download/CMakeLists.txt)
         if (WIN32)
             execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" -DBUILD_EXAMPLES=0FF.
-            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/libfreenect-download" )
+                WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/libfreenect-download" )
         else()
             execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
-            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/libfreenect-download" )
+                WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/libfreenect-download" )
         endif()
         execute_process(COMMAND "${CMAKE_COMMAND}" --build .
             WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/libfreenect-download" )
@@ -117,13 +130,6 @@ if((${CMAKE_CXX_COMPILER_ID} MATCHES "AppleClang") OR
         # 	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/libfreenect2-download" )
         # add_subdirectory("${CMAKE_BINARY_DIR}/libfreenect2-src"
         #                "${CMAKE_BINARY_DIR}/libfreenect2-build")
-    endif()
-
-    if(APPLE AND EXISTS /usr/local/opt/qt5)
-        # Homebrew installs Qt5 (up to at least 5.9.1) in
-        # /usr/local/qt5, ensure it can be found by CMake since
-        # it is not in the default /usr/local prefix.
-        list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/qt5")
     endif()
 
 
