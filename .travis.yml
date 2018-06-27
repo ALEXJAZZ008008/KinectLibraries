@@ -13,7 +13,7 @@ matrix:
 
    ####  osx
  - os: osx
-   env: EXTRA_BUILD_FLAGS="-DOWNLOAD_LibFreenect=ON -DBUILD_DOC=OFF 
+   env: EXTRA_BUILD_FLAGS="-DDOWNLOAD_LibFreenect=ON -DBUILD_DOC=OFF 
    -I/usr/local/opt/qt/include" CC=gcc CXX=g++
    LINK_DIRECTORIES="-L/usr/local/opt/qt/lib"
 
@@ -52,6 +52,7 @@ before_install:
       brew install libusb
       brew install freeglut
       brew install qt5
+      brew link qt5 --force
       echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.bash_profile
     fi   
       
