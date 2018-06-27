@@ -75,7 +75,7 @@ int KinectBackend::kinect_backend_main()
     }
 
     freenect_resolution resolution = FREENECT_RESOLUTION_MEDIUM;
-    freenect_depth_format depth_format = FREENECT_DEPTH_MM;
+    freenect_depth_format depth_format = FREENECT_DEPTH_11BIT;
 
     //Set depth and video modes
     if(freenect_set_depth_mode(m_fdev_ptr, freenect_find_depth_mode(resolution, depth_format)))
@@ -312,7 +312,13 @@ int KinectBackend::set_stored_camera_tilt(double increment)
 
 void KinectBackend::depth_callback(freenect_device *fdev_ptr, void *data, unsigned int timestamp)
 {
-    unsigned short *depth = (unsigned short *)data;
+    unsigned short *depth_ptr = (unsigned short *)data;
+
+    ofstream current_depth_stream;
+    current_depth_stream.open("current_depth_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
+
+    ofstream depth_pixel_value_stream;
+    depth_pixel_value_stream.open("depth_pixel_value_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
 
     ofstream depth0_stream;
     depth0_stream.open("depth0_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
@@ -323,39 +329,37 @@ void KinectBackend::depth_callback(freenect_device *fdev_ptr, void *data, unsign
     ofstream depth2_stream;
     depth2_stream.open("depth2_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
 
-    ofstream depth_pval_stream;
-    depth_pval_stream.open("depth_pval_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
-
     for(int i = 0; i < KinectBackend::getInstance().m_resolution[1]; i++)
     {
         for(int j = 0; j < KinectBackend::getInstance().m_resolution[0]; j++)
         {
-            //int pval = KinectBackend::getInstance().m_gamma[depth[(KinectBackend::getInstance().m_resolution[0] * i) + j]];
-            int pval = depth[(KinectBackend::getInstance().m_resolution[0] * i) + j];
+            unsigned short current_depth = depth_ptr[(KinectBackend::getInstance().m_resolution[0] * i) + j];
 
-            int lb = pval & 0xff;
+            int pixel_value = KinectBackend::getInstance().m_gamma[current_depth];
 
-            switch (pval >> 8)
+            int offset = pixel_value & 0xff;
+
+            switch (pixel_value >> 8)
             {
             case 0:
 
                 KinectBackend::getInstance().m_depth[j][i][0] = 255;
-                KinectBackend::getInstance().m_depth[j][i][1] = 255 - lb;
-                KinectBackend::getInstance().m_depth[j][i][2] = 255 - lb;
+                KinectBackend::getInstance().m_depth[j][i][1] = 255 - offset;
+                KinectBackend::getInstance().m_depth[j][i][2] = 255 - offset;
 
                 break;
 
             case 1:
 
                 KinectBackend::getInstance().m_depth[j][i][0] = 255;
-                KinectBackend::getInstance().m_depth[j][i][1] = lb;
+                KinectBackend::getInstance().m_depth[j][i][1] = offset;
                 KinectBackend::getInstance().m_depth[j][i][2] = 0;
 
                 break;
 
             case 2:
 
-                KinectBackend::getInstance().m_depth[j][i][0] = 255 - lb;
+                KinectBackend::getInstance().m_depth[j][i][0] = 255 - offset;
                 KinectBackend::getInstance().m_depth[j][i][1] = 255;
                 KinectBackend::getInstance().m_depth[j][i][2] = 0;
 
@@ -365,14 +369,14 @@ void KinectBackend::depth_callback(freenect_device *fdev_ptr, void *data, unsign
 
                 KinectBackend::getInstance().m_depth[j][i][0] = 0;
                 KinectBackend::getInstance().m_depth[j][i][1] = 255;
-                KinectBackend::getInstance().m_depth[j][i][2] = lb;
+                KinectBackend::getInstance().m_depth[j][i][2] = offset;
 
                 break;
 
             case 4:
 
                 KinectBackend::getInstance().m_depth[j][i][0] = 0;
-                KinectBackend::getInstance().m_depth[j][i][1] = 255 - lb;
+                KinectBackend::getInstance().m_depth[j][i][1] = 255 - offset;
                 KinectBackend::getInstance().m_depth[j][i][2] = 255;
 
                 break;
@@ -381,7 +385,7 @@ void KinectBackend::depth_callback(freenect_device *fdev_ptr, void *data, unsign
 
                 KinectBackend::getInstance().m_depth[j][i][0] = 0;
                 KinectBackend::getInstance().m_depth[j][i][1] = 0;
-                KinectBackend::getInstance().m_depth[j][i][2] = 255 - lb;
+                KinectBackend::getInstance().m_depth[j][i][2] = 255 - offset;
 
                 break;
 
@@ -394,17 +398,19 @@ void KinectBackend::depth_callback(freenect_device *fdev_ptr, void *data, unsign
                 break;
             }
 
+            current_depth_stream.write(reinterpret_cast<char *>(&current_depth), sizeof(unsigned short));
+            depth_pixel_value_stream.write(reinterpret_cast<char *>(&pixel_value), sizeof(unsigned short));
             depth0_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_depth[j][i][0]), sizeof(unsigned short));
             depth1_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_depth[j][i][1]), sizeof(unsigned short));
             depth2_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_depth[j][i][2]), sizeof(unsigned short));
-            depth_pval_stream.write(reinterpret_cast<char *>(&pval), sizeof(unsigned short));
         }
     }
 
+    current_depth_stream.close();
+    depth_pixel_value_stream.close();
     depth0_stream.close();
     depth1_stream.close();
     depth2_stream.close();
-    depth_pval_stream.close();
 
     KinectBackend::getInstance().append_depth_output("Received depth frame at " + to_string(timestamp) + "\n");
 }
