@@ -4,7 +4,6 @@ language: cpp
 cache: ccache
 
 # Environment variables:
-# To avoid too many builds, we mix some options (although independent tests would have been better)
 matrix:
  include:
    #### linux
@@ -40,7 +39,7 @@ addons:
 
 before_install:
   - |
-    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then 
+   if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then 
       brew update
       # seems to be needed on Travis due to conflicts with gcc otherwise
       # see https://github.com/travis-ci/travis-ci/issues/8826
@@ -50,6 +49,7 @@ before_install:
       brew install libusb
       brew install freeglut
       brew install qt5
+      brew link qt5 --force
     fi   
       
 install:
