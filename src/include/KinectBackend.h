@@ -1,6 +1,10 @@
 #ifndef KINECTBACKEND_H
 #define KINECTBACKEND_H
 
+#define _USE_MATH_DEFINES
+
+#include <assert.h>
+#include <math.h>
 #include <string>
 
 #include "libfreenect.h"
@@ -93,6 +97,13 @@ private:
 
     //! Current tilt state.
     freenect_raw_tilt_state *m_current_tilt_state_ptr;
+
+    uint8_t *m_depth_mid_ptr;
+
+    uint8_t *m_rgb_back_ptr;
+    uint8_t *m_rgb_mid_ptr;
+
+    uint16_t m_gamma[2048];
 
     //! General output
     string m_output;
