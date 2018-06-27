@@ -87,6 +87,13 @@ if((${CMAKE_CXX_COMPILER_ID} MATCHES "AppleClang") OR
         #                "${CMAKE_BINARY_DIR}/libfreenect2-build")
     endif()
 
+    if(APPLE AND EXISTS /usr/local/opt/qt5)
+            # Homebrew installs Qt5 (up to at least 5.9.1) in
+            # /usr/local/qt5, ensure it can be found by CMake since
+            # it is not in the default /usr/local prefix.
+            list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/qt5")
+    endif()
+
     # Find the Qt components
     find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
 
