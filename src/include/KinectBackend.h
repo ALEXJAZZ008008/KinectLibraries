@@ -100,9 +100,9 @@ private:
 
     unsigned short m_gamma[2048];
 
-    unsigned char m_depth[640 * 480 * 3];
+    unsigned char m_depth[1280][1024][3];
 
-    unsigned char m_video[640][480][3];
+    unsigned char m_video[1280][1024][3];
 
     //! General output
     string m_output;
@@ -112,6 +112,8 @@ private:
 
     //! Video output
     string m_video_output;
+
+    unsigned short m_resolution[2];
 
     //! Camera tilt
     double m_stored_camera_tilt;

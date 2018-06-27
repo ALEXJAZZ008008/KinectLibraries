@@ -10,6 +10,7 @@ KinectBackend::KinectBackend():
     m_output(""),
     m_depth_output(""),
     m_video_output(""),
+    m_resolution(),
     m_stored_camera_tilt(0.0),
     m_increment(2.0),
     m_num_devices(0)
@@ -77,19 +78,48 @@ int KinectBackend::kinect_backend_main()
         return -1;
     }
 
+    freenect_resolution resolution = FREENECT_RESOLUTION_MEDIUM;
+
     //Set depth and video modes
-    if(freenect_set_depth_mode(m_fdev_ptr, freenect_find_depth_mode(FREENECT_RESOLUTION_MEDIUM, FREENECT_DEPTH_11BIT)))
+    if(freenect_set_depth_mode(m_fdev_ptr, freenect_find_depth_mode(resolution, FREENECT_DEPTH_MM)))
     {
         m_output += "Unable to set depth mode!!\n";
 
         return -1;
     }
 
-    if (freenect_set_video_mode(m_fdev_ptr, freenect_find_video_mode(FREENECT_RESOLUTION_MEDIUM, FREENECT_VIDEO_RGB)))
+    if (freenect_set_video_mode(m_fdev_ptr, freenect_find_video_mode(resolution, FREENECT_VIDEO_RGB)))
     {
         m_output += "Unable to set video mode!!\n";
 
         return -1;
+    }
+
+    switch(resolution)
+    {
+    case FREENECT_RESOLUTION_LOW:
+
+        m_resolution[0] = 320;
+        m_resolution[1] = 240;
+
+        break;
+
+    case FREENECT_RESOLUTION_MEDIUM:
+
+        m_resolution[0] = 640;
+        m_resolution[1] = 480;
+
+        break;
+
+    case FREENECT_RESOLUTION_HIGH:
+
+        m_resolution[0] = 1280;
+        m_resolution[1] = 1024;
+
+        break;
+
+    default:
+        break;
     }
 
     //Set frame callback
@@ -250,71 +280,81 @@ void KinectBackend::depth_callback(freenect_device *fdev_ptr, void *data, unsign
 {
     unsigned short *depth = (unsigned short *)data;
 
-    for(int i = 0; i < 640 * 480; i++)
+    ofstream myfile;
+    myfile.open("depth_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
+
+    for(int i = 0; i < KinectBackend::getInstance().m_resolution[1]; i++)
     {
-        int pval = KinectBackend::getInstance().m_gamma[depth[i]];
-
-        int lb = pval & 0xff;
-
-        switch (pval >> 8)
+        for(int j = 0; j < KinectBackend::getInstance().m_resolution[0]; j++)
         {
-        case 0:
+            int pval = KinectBackend::getInstance().m_gamma[depth[(KinectBackend::getInstance().m_resolution[0] * i) + j]];
 
-            KinectBackend::getInstance().m_depth[3 * i + 0] = 255;
-            KinectBackend::getInstance().m_depth[3 * i + 1] = 255 - lb;
-            KinectBackend::getInstance().m_depth[3 * i + 2] = 255 - lb;
+            int lb = pval & 0xff;
 
-            break;
+            switch (pval >> 8)
+            {
+            case 0:
 
-        case 1:
+                KinectBackend::getInstance().m_depth[j][i][0] = 255;
+                KinectBackend::getInstance().m_depth[j][i][1] = 255 - lb;
+                KinectBackend::getInstance().m_depth[j][i][2] = 255 - lb;
 
-            KinectBackend::getInstance().m_depth[3 * i + 0] = 255;
-            KinectBackend::getInstance().m_depth[3 * i + 1] = lb;
-            KinectBackend::getInstance().m_depth[3 * i + 2] = 0;
+                break;
 
-            break;
+            case 1:
 
-        case 2:
+                KinectBackend::getInstance().m_depth[j][i][0] = 255;
+                KinectBackend::getInstance().m_depth[j][i][1] = lb;
+                KinectBackend::getInstance().m_depth[j][i][2] = 0;
 
-            KinectBackend::getInstance().m_depth[3 * i + 0] = 255 - lb;
-            KinectBackend::getInstance().m_depth[3 * i + 1] = 255;
-            KinectBackend::getInstance().m_depth[3 * i + 2] = 0;
+                break;
 
-            break;
+            case 2:
 
-        case 3:
+                KinectBackend::getInstance().m_depth[j][i][0] = 255 - lb;
+                KinectBackend::getInstance().m_depth[j][i][1] = 255;
+                KinectBackend::getInstance().m_depth[j][i][2] = 0;
 
-            KinectBackend::getInstance().m_depth[3 * i + 0] = 0;
-            KinectBackend::getInstance().m_depth[3 * i + 1] = 255;
-            KinectBackend::getInstance().m_depth[3 * i + 2] = lb;
+                break;
 
-            break;
+            case 3:
 
-        case 4:
+                KinectBackend::getInstance().m_depth[j][i][0] = 0;
+                KinectBackend::getInstance().m_depth[j][i][1] = 255;
+                KinectBackend::getInstance().m_depth[j][i][2] = lb;
 
-            KinectBackend::getInstance().m_depth[3 * i + 0] = 0;
-            KinectBackend::getInstance().m_depth[3 * i + 1] = 255 - lb;
-            KinectBackend::getInstance().m_depth[3 * i + 2] = 255;
+                break;
 
-            break;
+            case 4:
 
-        case 5:
+                KinectBackend::getInstance().m_depth[j][i][0] = 0;
+                KinectBackend::getInstance().m_depth[j][i][1] = 255 - lb;
+                KinectBackend::getInstance().m_depth[j][i][2] = 255;
 
-            KinectBackend::getInstance().m_depth[3 * i + 0] = 0;
-            KinectBackend::getInstance().m_depth[3 * i + 1] = 0;
-            KinectBackend::getInstance().m_depth[3 * i + 2] = 255 - lb;
+                break;
 
-            break;
+            case 5:
 
-        default:
+                KinectBackend::getInstance().m_depth[j][i][0] = 0;
+                KinectBackend::getInstance().m_depth[j][i][1] = 0;
+                KinectBackend::getInstance().m_depth[j][i][2] = 255 - lb;
 
-            KinectBackend::getInstance().m_depth[3 * i + 0] = 0;
-            KinectBackend::getInstance().m_depth[3 * i + 1] = 0;
-            KinectBackend::getInstance().m_depth[3 * i + 2] = 0;
+                break;
 
-            break;
+            default:
+
+                KinectBackend::getInstance().m_depth[j][i][0] = 0;
+                KinectBackend::getInstance().m_depth[j][i][1] = 0;
+                KinectBackend::getInstance().m_depth[j][i][2] = 0;
+
+                break;
+            }
+
+            myfile.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_depth[j][i][0]), sizeof(unsigned char));
         }
     }
+
+    myfile.close();
 
     KinectBackend::getInstance().append_depth_output("Received depth frame at " + to_string(timestamp) + "\n");
 }
@@ -326,15 +366,15 @@ void KinectBackend::video_callback(freenect_device *fdev_ptr, void *data_ptr, un
     unsigned char intensity = 0;
 
     ofstream myfile;
-    myfile.open("image_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
+    myfile.open("video_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
 
-    for(int i = 0; i < 480; i++)
+    for(int i = 0; i < KinectBackend::getInstance().m_resolution[1]; i++)
     {
-        for(int j = 0; j < 640; j++)
+        for(int j = 0; j < KinectBackend::getInstance().m_resolution[0]; j++)
         {
-            KinectBackend::getInstance().m_video[j][i][0] = video_ptr[((640 * i) + j) * 3];
-            KinectBackend::getInstance().m_video[j][i][1] = video_ptr[(((640 * i) + j) * 3) + 1];
-            KinectBackend::getInstance().m_video[j][i][2] = video_ptr[(((640 * i) + j) * 3) + 2];
+            KinectBackend::getInstance().m_video[j][i][0] = video_ptr[((KinectBackend::getInstance().m_resolution[0] * i) + j) * 3];
+            KinectBackend::getInstance().m_video[j][i][1] = video_ptr[(((KinectBackend::getInstance().m_resolution[0] * i) + j) * 3) + 1];
+            KinectBackend::getInstance().m_video[j][i][2] = video_ptr[(((KinectBackend::getInstance().m_resolution[0] * i) + j) * 3) + 2];
 
             intensity = (KinectBackend::getInstance().m_video[j][i][0] +
                     KinectBackend::getInstance().m_video[j][i][0] +
