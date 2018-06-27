@@ -49,7 +49,25 @@ before_install:
       brew install libusb
       brew install freeglut
       brew install qt5
-      brew link --force qt5 && ln -s /usr/local/Cellar/qt5/5.4.0/mkspecs /usr/local/mkspecs && ln -s /usr/local/Cellar/qt5/5.4.0/plugins /usr/local/plugins
+      
+# Canonical path to qt5 directory
+QT="/usr/local/Cellar/qt"
+if [ ! -d "$QT" ]; then
+    # Alternative (old) path to qt5 directory
+    QT+="5"
+    if [ ! -d "$QT" ]; then
+        echo "Qt/Qt5 not found!"
+        exit
+    fi
+fi
+QT5_DIR="$QT/$(ls $QT | sort -r | head -n1)"
+echo $QT5_DIR
+
+# Change qt5 framework ids
+for framework in $(find "$QT5_DIR/lib" -regex ".*/\(Qt[a-zA-Z]*\)\.framework/Versions/5/\1"); do
+    echo "$framework"
+    install_name_tool -id "$framework" "$framework"
+done
     fi   
       
 install:
