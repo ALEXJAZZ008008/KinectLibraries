@@ -98,9 +98,9 @@ private:
     //! Current tilt state.
     freenect_raw_tilt_state *m_current_tilt_state_ptr;
 
-    unsigned short m_gamma[2048];
+    unsigned short m_gamma[10000];
 
-    unsigned char m_depth[1280][1024][3];
+    unsigned short m_depth[1280][1024][3];
 
     unsigned char m_video[1280][1024][3];
 
@@ -114,6 +114,10 @@ private:
     string m_video_output;
 
     unsigned short m_resolution[2];
+
+    double m_max_value;
+
+    double m_reset_camera_tilt;
 
     //! Camera tilt
     double m_stored_camera_tilt;

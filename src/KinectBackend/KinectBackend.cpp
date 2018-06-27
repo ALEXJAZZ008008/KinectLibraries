@@ -11,17 +11,13 @@ KinectBackend::KinectBackend():
     m_depth_output(""),
     m_video_output(""),
     m_resolution(),
+    m_max_value(0),
+    m_reset_camera_tilt(-20.0),
     m_stored_camera_tilt(0.0),
     m_increment(2.0),
     m_num_devices(0)
 {
-    for (int i = 0; i < 2048; i++)
-    {
-        double v = i / 2048.0;
-        v = pow(v, 3) * 6;
 
-        m_gamma[i] = v * 6 * 256;
-    }
 }
 
 KinectBackend::~KinectBackend()
@@ -79,9 +75,10 @@ int KinectBackend::kinect_backend_main()
     }
 
     freenect_resolution resolution = FREENECT_RESOLUTION_MEDIUM;
+    freenect_depth_format depth_format = FREENECT_DEPTH_MM;
 
     //Set depth and video modes
-    if(freenect_set_depth_mode(m_fdev_ptr, freenect_find_depth_mode(resolution, FREENECT_DEPTH_MM)))
+    if(freenect_set_depth_mode(m_fdev_ptr, freenect_find_depth_mode(resolution, depth_format)))
     {
         m_output += "Unable to set depth mode!!\n";
 
@@ -119,7 +116,44 @@ int KinectBackend::kinect_backend_main()
         break;
 
     default:
+
+        m_resolution[0] = 0;
+        m_resolution[1] = 0;
+
         break;
+    }
+
+    switch(depth_format)
+    {
+    case FREENECT_DEPTH_11BIT:
+    case FREENECT_DEPTH_10BIT:
+    case FREENECT_DEPTH_11BIT_PACKED:
+    case FREENECT_DEPTH_10BIT_PACKED:
+
+        m_max_value = 10000.0;
+
+        break;
+
+    case FREENECT_DEPTH_REGISTERED:
+    case FREENECT_DEPTH_MM:
+
+        m_max_value = 2048.0;
+
+        break;
+
+    default:
+
+        m_max_value = 0.0;
+
+        break;
+    }
+
+    for (int i = 0; i < m_max_value; i++)
+    {
+        double v = i / m_max_value;
+        v = pow(v, 3) * 6;
+
+        m_gamma[i] = v * 1536;
     }
 
     //Set frame callback
@@ -140,7 +174,7 @@ int KinectBackend::kinect_backend_main()
         return -1;
     }
 
-    set_device_camera_tilt(0.0);
+    set_device_camera_tilt(m_reset_camera_tilt);
 
     freenect_set_led(m_fdev_ptr, LED_RED);
 
@@ -151,8 +185,6 @@ int KinectBackend::kinect_backend_main()
 
 int KinectBackend::kinect_backend_kill()
 {
-    set_device_camera_tilt(0.0);
-
     destructor();
 
     return 1;
@@ -187,6 +219,8 @@ string KinectBackend::get_video_output()
 
 int KinectBackend::destructor()
 {
+    set_device_camera_tilt(m_reset_camera_tilt);
+
     if(m_fdev_ptr != nullptr)
     {
         freenect_stop_depth(m_fdev_ptr);
@@ -280,14 +314,24 @@ void KinectBackend::depth_callback(freenect_device *fdev_ptr, void *data, unsign
 {
     unsigned short *depth = (unsigned short *)data;
 
-    ofstream myfile;
-    myfile.open("depth_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
+    ofstream depth0_stream;
+    depth0_stream.open("depth0_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
+
+    ofstream depth1_stream;
+    depth1_stream.open("depth1_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
+
+    ofstream depth2_stream;
+    depth2_stream.open("depth2_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
+
+    ofstream depth_pval_stream;
+    depth_pval_stream.open("depth_pval_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
 
     for(int i = 0; i < KinectBackend::getInstance().m_resolution[1]; i++)
     {
         for(int j = 0; j < KinectBackend::getInstance().m_resolution[0]; j++)
         {
-            int pval = KinectBackend::getInstance().m_gamma[depth[(KinectBackend::getInstance().m_resolution[0] * i) + j]];
+            //int pval = KinectBackend::getInstance().m_gamma[depth[(KinectBackend::getInstance().m_resolution[0] * i) + j]];
+            int pval = depth[(KinectBackend::getInstance().m_resolution[0] * i) + j];
 
             int lb = pval & 0xff;
 
@@ -350,11 +394,17 @@ void KinectBackend::depth_callback(freenect_device *fdev_ptr, void *data, unsign
                 break;
             }
 
-            myfile.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_depth[j][i][0]), sizeof(unsigned char));
+            depth0_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_depth[j][i][0]), sizeof(unsigned short));
+            depth1_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_depth[j][i][1]), sizeof(unsigned short));
+            depth2_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_depth[j][i][2]), sizeof(unsigned short));
+            depth_pval_stream.write(reinterpret_cast<char *>(&pval), sizeof(unsigned short));
         }
     }
 
-    myfile.close();
+    depth0_stream.close();
+    depth1_stream.close();
+    depth2_stream.close();
+    depth_pval_stream.close();
 
     KinectBackend::getInstance().append_depth_output("Received depth frame at " + to_string(timestamp) + "\n");
 }
@@ -363,10 +413,13 @@ void KinectBackend::video_callback(freenect_device *fdev_ptr, void *data_ptr, un
 {
     unsigned char *video_ptr = static_cast<unsigned char *>(data_ptr);
 
-    unsigned char intensity = 0;
+    unsigned char average = 0;
 
-    ofstream myfile;
-    myfile.open("video_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
+    ofstream video_bw_stream;
+    video_bw_stream.open("video_bw_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
+
+    ofstream video_rgb_stream;
+    video_rgb_stream.open("video_rgb_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
 
     for(int i = 0; i < KinectBackend::getInstance().m_resolution[1]; i++)
     {
@@ -376,15 +429,21 @@ void KinectBackend::video_callback(freenect_device *fdev_ptr, void *data_ptr, un
             KinectBackend::getInstance().m_video[j][i][1] = video_ptr[(((KinectBackend::getInstance().m_resolution[0] * i) + j) * 3) + 1];
             KinectBackend::getInstance().m_video[j][i][2] = video_ptr[(((KinectBackend::getInstance().m_resolution[0] * i) + j) * 3) + 2];
 
-            intensity = (KinectBackend::getInstance().m_video[j][i][0] +
+            average = (KinectBackend::getInstance().m_video[j][i][0] +
                     KinectBackend::getInstance().m_video[j][i][0] +
                     KinectBackend::getInstance().m_video[j][i][0]) / 3;
 
-            myfile.write(reinterpret_cast<char *>(&intensity), sizeof(unsigned char));
+            video_bw_stream.write(reinterpret_cast<char *>(&average), sizeof(unsigned char));
+
+            video_rgb_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_video[j][i][0]), sizeof(unsigned char));
+            video_rgb_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_video[j][i][1]), sizeof(unsigned char));
+            video_rgb_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_video[j][i][2]), sizeof(unsigned char));
         }
     }
 
-    myfile.close();
+    video_bw_stream.close();
+
+    video_rgb_stream.close();
 
     KinectBackend::getInstance().append_video_output("Received video frame at "  + to_string(timestamp) + "\n");
 }
