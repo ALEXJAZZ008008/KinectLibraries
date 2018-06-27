@@ -4,6 +4,7 @@
 #define _USE_MATH_DEFINES
 
 #include <math.h>
+#include <fstream>
 #include <string>
 
 #include "libfreenect.h"
