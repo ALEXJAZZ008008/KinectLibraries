@@ -4,7 +4,6 @@ language: cpp
 cache: ccache
 
 # Environment variables:
-# To avoid too many builds, we mix some options (although independent tests would have been better)
 matrix:
  include:
    #### linux
@@ -13,7 +12,7 @@ matrix:
 
    ####  osx
  - os: osx
-   env: EXTRA_BUILD_FLAGS="-DDOWNLOAD_LibFreenect=ON -DBUILD_DOC=OFF" CC=gcc CXX=g++
+   env: EXTRA_BUILD_FLAGS="-DDOWNLOAD_LibFreenect=ON -DBUILD_DOC=OFF -DCMAKE_PREFIX_PATH=$QT5_DIR/" CC=gcc CXX=g++
 
 env:
   global:
@@ -50,6 +49,7 @@ before_install:
       brew install libusb
       brew install freeglut
       brew install qt5
+      QT5_DIR=$(brew info --installed qt5 | grep "^$(brew --cellar qt5)" | cut -d' ' -f1)
     fi   
       
 install:
