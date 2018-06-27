@@ -94,6 +94,25 @@ if((${CMAKE_CXX_COMPILER_ID} MATCHES "AppleClang") OR
             list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/qt5")
     endif()
 
+    if(WIN32)
+        configure_file(${CMAKE_MODULE_PATH}/libusb.txt.in libusb-download/CMakeLists.txt)
+        execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/libusb-download" )
+        execute_process(COMMAND "${CMAKE_COMMAND}" --build .
+            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/libfreenect-download" )
+        add_subdirectory("${CMAKE_BINARY_DIR}/libusb-src"
+            "${CMAKE_BINARY_DIR}/libusb-build")
+
+        INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR}/libusb-src/include)
+        set(LIBUSB_1_INCLUDE_DIR "${CMAKE_BINARY_DIR}/libusb-src/include")
+
+        set(LIBUSB_1_LIB_DIR "${CMAKE_BINARY_DIR}/lib")
+        set(prefix "")
+        set(suffix ".lib")
+
+        set(LIBUSB_1_LIBRARY "${LIBUSB_1_LIB_DIR}/${prefix}usb${suffix}")
+    endif()
+
     # Find the Qt components
     find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
 
