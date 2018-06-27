@@ -4,9 +4,9 @@ KinectBackend::KinectBackend():
     m_fctx_ptr(nullptr),
     m_fdev_ptr(nullptr),
     m_current_tilt_state_ptr(nullptr),
-    m_depth(),
-    m_video_ptr((unsigned char *)new unsigned char[640 * 480 * 3]),
     m_gamma(),
+    m_depth(),
+    m_video(),
     m_output(""),
     m_depth_output(""),
     m_video_output(""),
@@ -16,8 +16,8 @@ KinectBackend::KinectBackend():
 {
     for (int i = 0; i < 2048; i++)
     {
-        float v = i / 2048.0f;
-        v = powf(v, 3) * 6;
+        double v = i / 2048.0;
+        v = pow(v, 3) * 6;
 
         m_gamma[i] = v * 6 * 256;
     }
@@ -54,7 +54,7 @@ int KinectBackend::kinect_backend_main()
     }
 
     freenect_set_log_level(m_fctx_ptr, FREENECT_LOG_DEBUG);
-    freenect_select_subdevices(m_fctx_ptr, (freenect_device_flags)(FREENECT_DEVICE_MOTOR | FREENECT_DEVICE_CAMERA));
+    freenect_select_subdevices(m_fctx_ptr, static_cast<freenect_device_flags>(FREENECT_DEVICE_MOTOR | FREENECT_DEVICE_CAMERA));
 
     m_num_devices = freenect_num_devices(m_fctx_ptr);
 
@@ -178,13 +178,6 @@ int KinectBackend::destructor()
         delete m_current_tilt_state_ptr;
 
         m_current_tilt_state_ptr = nullptr;
-    }
-
-    if(m_video_ptr != nullptr)
-    {
-        //delete[] m_video_ptr;
-
-        m_video_ptr = nullptr;
     }
 
     m_output += "Connection terminated!!\n";
@@ -322,21 +315,28 @@ void KinectBackend::depth_callback(freenect_device *fdev_ptr, void *data, unsign
             break;
         }
 
-        KinectBackend::getInstance().append_depth_output(to_string(KinectBackend::getInstance().m_depth[3 * i + 0]) + " " +
-                to_string(KinectBackend::getInstance().m_depth[3 * i + 1]) + " " +
-                to_string(KinectBackend::getInstance().m_depth[3 * i + 2]) + "\n");
-
-        //KinectBackend::getInstance().append_video_output(to_string(KinectBackend::getInstance().m_video_ptr[3 * i + 0]) + " " +
-        //        to_string(KinectBackend::getInstance().m_video_ptr[3 * i + 1]) + " " +
-        //        to_string(KinectBackend::getInstance().m_video_ptr[3 * i + 2]) + "\n");
+        //KinectBackend::getInstance().append_depth_output("[" + to_string(KinectBackend::getInstance().m_depth[3 * i + 0]) + ", " +
+        //        to_string(KinectBackend::getInstance().m_depth[3 * i + 1]) + ", " +
+        //        to_string(KinectBackend::getInstance().m_depth[3 * i + 2]) + "]\n");
     }
 
     KinectBackend::getInstance().append_depth_output("Received depth frame at " + to_string(timestamp) + "\n");
 }
 
-void KinectBackend::video_callback(freenect_device *fdev_ptr, void *data, unsigned int timestamp)
+void KinectBackend::video_callback(freenect_device *fdev_ptr, void *data_ptr, unsigned int timestamp)
 {
-    KinectBackend::getInstance().m_video_ptr = (unsigned char *)data;
+    unsigned char *video_ptr = static_cast<unsigned char *>(data_ptr);
+
+    for (int i = 0; i < 640 * 480; i++)
+    {
+        KinectBackend::getInstance().m_video[3 * i + 0] = video_ptr[3 * i + 0];
+        KinectBackend::getInstance().m_video[3 * i + 1] = video_ptr[3 * i + 1];
+        KinectBackend::getInstance().m_video[3 * i + 2] = video_ptr[3 * i + 2];
+
+        KinectBackend::getInstance().append_video_output("[" + to_string(KinectBackend::getInstance().m_video[3 * i + 0]) + ", " +
+                to_string(KinectBackend::getInstance().m_video[3 * i + 1]) + ", " +
+                to_string(KinectBackend::getInstance().m_video[3 * i + 2]) + "],\n");
+    }
 
     KinectBackend::getInstance().append_video_output("Received video frame at "  + to_string(timestamp) + "\n");
 }

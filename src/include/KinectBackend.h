@@ -3,7 +3,6 @@
 
 #define _USE_MATH_DEFINES
 
-#include <assert.h>
 #include <math.h>
 #include <string>
 
@@ -98,11 +97,11 @@ private:
     //! Current tilt state.
     freenect_raw_tilt_state *m_current_tilt_state_ptr;
 
+    unsigned short m_gamma[2048];
+
     unsigned char m_depth[640 * 480 * 3];
 
-    unsigned char *m_video_ptr;
-
-    unsigned short m_gamma[2048];
+    unsigned char m_video[640 * 480 * 3];
 
     //! General output
     string m_output;
