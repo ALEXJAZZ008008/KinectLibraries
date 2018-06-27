@@ -250,7 +250,7 @@ void KinectBackend::depth_callback(freenect_device *fdev_ptr, void *data, unsign
 {
     unsigned short *depth = (unsigned short *)data;
 
-    for (int i = 0; i < 640 * 480; i++)
+    for(int i = 0; i < 640 * 480; i++)
     {
         int pval = KinectBackend::getInstance().m_gamma[depth[i]];
 
@@ -327,16 +327,43 @@ void KinectBackend::video_callback(freenect_device *fdev_ptr, void *data_ptr, un
 {
     unsigned char *video_ptr = static_cast<unsigned char *>(data_ptr);
 
-    for (int i = 0; i < 640 * 480; i++)
-    {
-        KinectBackend::getInstance().m_video[3 * i + 0] = video_ptr[3 * i + 0];
-        KinectBackend::getInstance().m_video[3 * i + 1] = video_ptr[3 * i + 1];
-        KinectBackend::getInstance().m_video[3 * i + 2] = video_ptr[3 * i + 2];
+    KinectBackend::getInstance().append_video_output("[");
 
-        KinectBackend::getInstance().append_video_output("[" + to_string(KinectBackend::getInstance().m_video[3 * i + 0]) + ", " +
-                to_string(KinectBackend::getInstance().m_video[3 * i + 1]) + ", " +
-                to_string(KinectBackend::getInstance().m_video[3 * i + 2]) + "],\n");
+    for(int i = 0; i < 640; i++)
+    {
+        KinectBackend::getInstance().append_video_output("[");
+
+        for(int j = 0; j < 480; j++)
+        {
+            KinectBackend::getInstance().m_video[i][j][0] = video_ptr[3 * i * j + 0];
+            KinectBackend::getInstance().m_video[i][j][1] = video_ptr[3 * i * j + 1];
+            KinectBackend::getInstance().m_video[i][j][2] = video_ptr[3 * i * j + 2];
+
+            KinectBackend::getInstance().append_video_output("[" + to_string(KinectBackend::getInstance().m_video[i][j][0]) + ", " +
+                    to_string(KinectBackend::getInstance().m_video[i][j][1]) + ", " +
+                    to_string(KinectBackend::getInstance().m_video[i][j][2]));
+
+            if(j < 479)
+            {
+                KinectBackend::getInstance().append_video_output("],\n");
+            }
+            else
+            {
+                KinectBackend::getInstance().append_video_output("]");
+            }
+        }
+
+        if(i < 639)
+        {
+            KinectBackend::getInstance().append_video_output("],\n");
+        }
+        else
+        {
+            KinectBackend::getInstance().append_video_output("]");
+        }
     }
+
+    KinectBackend::getInstance().append_video_output("]\n");
 
     KinectBackend::getInstance().append_video_output("Received video frame at "  + to_string(timestamp) + "\n");
 }

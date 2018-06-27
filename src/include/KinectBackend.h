@@ -101,7 +101,7 @@ private:
 
     unsigned char m_depth[640 * 480 * 3];
 
-    unsigned char m_video[640 * 480 * 3];
+    unsigned char m_video[640][480][3];
 
     //! General output
     string m_output;
