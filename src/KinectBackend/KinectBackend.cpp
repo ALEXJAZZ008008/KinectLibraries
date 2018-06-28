@@ -4,14 +4,12 @@ KinectBackend::KinectBackend():
     m_fctx_ptr(nullptr),
     m_fdev_ptr(nullptr),
     m_current_tilt_state_ptr(nullptr),
-    m_gamma(),
     m_depth(),
     m_video(),
     m_output(""),
     m_depth_output(""),
     m_video_output(""),
     m_resolution(),
-    m_max_value(0),
     m_reset_camera_tilt(-20.0),
     m_stored_camera_tilt(0.0),
     m_increment(2.0),
@@ -75,10 +73,9 @@ int KinectBackend::kinect_backend_main()
     }
 
     freenect_resolution resolution = FREENECT_RESOLUTION_MEDIUM;
-    freenect_depth_format depth_format = FREENECT_DEPTH_MM;
 
     //Set depth and video modes
-    if(freenect_set_depth_mode(m_fdev_ptr, freenect_find_depth_mode(resolution, depth_format)))
+    if(freenect_set_depth_mode(m_fdev_ptr, freenect_find_depth_mode(resolution, FREENECT_DEPTH_MM)))
     {
         m_output += "Unable to set depth mode!!\n";
 
@@ -121,39 +118,6 @@ int KinectBackend::kinect_backend_main()
         m_resolution[1] = 0;
 
         break;
-    }
-
-    switch(depth_format)
-    {
-    case FREENECT_DEPTH_11BIT:
-    case FREENECT_DEPTH_10BIT:
-    case FREENECT_DEPTH_11BIT_PACKED:
-    case FREENECT_DEPTH_10BIT_PACKED:
-
-        m_max_value = 10000.0;
-
-        break;
-
-    case FREENECT_DEPTH_REGISTERED:
-    case FREENECT_DEPTH_MM:
-
-        m_max_value = 2048.0;
-
-        break;
-
-    default:
-
-        m_max_value = 0.0;
-
-        break;
-    }
-
-    for (int i = 0; i < m_max_value; i++)
-    {
-        double v = i / m_max_value;
-        v = pow(v, 3) * 6;
-
-        m_gamma[i] = v * 1536;
     }
 
     //Set frame callback
@@ -314,103 +278,20 @@ void KinectBackend::depth_callback(freenect_device *fdev_ptr, void *data, unsign
 {
     unsigned short *depth_ptr = (unsigned short *)data;
 
-    ofstream current_depth_stream;
-    current_depth_stream.open("current_depth_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
-
-    ofstream depth_pixel_value_stream;
-    depth_pixel_value_stream.open("depth_pixel_value_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
-
-    ofstream depth0_stream;
-    depth0_stream.open("depth0_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
-
-    ofstream depth1_stream;
-    depth1_stream.open("depth1_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
-
-    ofstream depth2_stream;
-    depth2_stream.open("depth2_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
+    ofstream depth_stream;
+    depth_stream.open("depth_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
 
     for(int i = 0; i < KinectBackend::getInstance().m_resolution[1]; i++)
     {
         for(int j = 0; j < KinectBackend::getInstance().m_resolution[0]; j++)
         {
-            unsigned short current_depth = depth_ptr[(KinectBackend::getInstance().m_resolution[0] * i) + j] >> 3;
+            KinectBackend::getInstance().m_depth[j][i] = depth_ptr[(KinectBackend::getInstance().m_resolution[0] * i) + j] >> 3;
 
-            int pixel_value = KinectBackend::getInstance().m_gamma[current_depth];
-
-            int offset = pixel_value & 0xff;
-
-            switch (pixel_value >> 8)
-            {
-            case 0:
-
-                KinectBackend::getInstance().m_depth[j][i][0] = 255;
-                KinectBackend::getInstance().m_depth[j][i][1] = 255 - offset;
-                KinectBackend::getInstance().m_depth[j][i][2] = 255 - offset;
-
-                break;
-
-            case 1:
-
-                KinectBackend::getInstance().m_depth[j][i][0] = 255;
-                KinectBackend::getInstance().m_depth[j][i][1] = offset;
-                KinectBackend::getInstance().m_depth[j][i][2] = 0;
-
-                break;
-
-            case 2:
-
-                KinectBackend::getInstance().m_depth[j][i][0] = 255 - offset;
-                KinectBackend::getInstance().m_depth[j][i][1] = 255;
-                KinectBackend::getInstance().m_depth[j][i][2] = 0;
-
-                break;
-
-            case 3:
-
-                KinectBackend::getInstance().m_depth[j][i][0] = 0;
-                KinectBackend::getInstance().m_depth[j][i][1] = 255;
-                KinectBackend::getInstance().m_depth[j][i][2] = offset;
-
-                break;
-
-            case 4:
-
-                KinectBackend::getInstance().m_depth[j][i][0] = 0;
-                KinectBackend::getInstance().m_depth[j][i][1] = 255 - offset;
-                KinectBackend::getInstance().m_depth[j][i][2] = 255;
-
-                break;
-
-            case 5:
-
-                KinectBackend::getInstance().m_depth[j][i][0] = 0;
-                KinectBackend::getInstance().m_depth[j][i][1] = 0;
-                KinectBackend::getInstance().m_depth[j][i][2] = 255 - offset;
-
-                break;
-
-            default:
-
-                KinectBackend::getInstance().m_depth[j][i][0] = 0;
-                KinectBackend::getInstance().m_depth[j][i][1] = 0;
-                KinectBackend::getInstance().m_depth[j][i][2] = 0;
-
-                break;
-            }
-
-            current_depth_stream.write(reinterpret_cast<char *>(&current_depth), sizeof(unsigned short));
-            depth_pixel_value_stream.write(reinterpret_cast<char *>(&pixel_value), sizeof(unsigned short));
-            depth0_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_depth[j][i][0]), sizeof(unsigned short));
-            depth1_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_depth[j][i][1]), sizeof(unsigned short));
-            depth2_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_depth[j][i][2]), sizeof(unsigned short));
+            depth_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_depth[j][i]), sizeof(unsigned short));
         }
     }
 
-    current_depth_stream.close();
-    depth_pixel_value_stream.close();
-    depth0_stream.close();
-    depth1_stream.close();
-    depth2_stream.close();
+    depth_stream.close();
 
     KinectBackend::getInstance().append_depth_output("Received depth frame at " + to_string(timestamp) + "\n");
 }
@@ -421,11 +302,8 @@ void KinectBackend::video_callback(freenect_device *fdev_ptr, void *data_ptr, un
 
     unsigned char average = 0;
 
-    ofstream video_bw_stream;
-    video_bw_stream.open("video_bw_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
-
-    ofstream video_rgb_stream;
-    video_rgb_stream.open("video_rgb_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
+    ofstream video_stream;
+    video_stream.open("video_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
 
     for(int i = 0; i < KinectBackend::getInstance().m_resolution[1]; i++)
     {
@@ -435,21 +313,13 @@ void KinectBackend::video_callback(freenect_device *fdev_ptr, void *data_ptr, un
             KinectBackend::getInstance().m_video[j][i][1] = video_ptr[(((KinectBackend::getInstance().m_resolution[0] * i) + j) * 3) + 1];
             KinectBackend::getInstance().m_video[j][i][2] = video_ptr[(((KinectBackend::getInstance().m_resolution[0] * i) + j) * 3) + 2];
 
-            average = (KinectBackend::getInstance().m_video[j][i][0] +
-                    KinectBackend::getInstance().m_video[j][i][0] +
-                    KinectBackend::getInstance().m_video[j][i][0]) / 3;
-
-            video_bw_stream.write(reinterpret_cast<char *>(&average), sizeof(unsigned char));
-
-            video_rgb_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_video[j][i][0]), sizeof(unsigned char));
-            video_rgb_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_video[j][i][1]), sizeof(unsigned char));
-            video_rgb_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_video[j][i][2]), sizeof(unsigned char));
+            video_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_video[j][i][0]), sizeof(unsigned char));
+            video_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_video[j][i][1]), sizeof(unsigned char));
+            video_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_video[j][i][2]), sizeof(unsigned char));
         }
     }
 
-    video_bw_stream.close();
-
-    video_rgb_stream.close();
+    video_stream.close();
 
     KinectBackend::getInstance().append_video_output("Received video frame at "  + to_string(timestamp) + "\n");
 }
