@@ -75,7 +75,7 @@ int KinectBackend::kinect_backend_main()
     }
 
     freenect_resolution resolution = FREENECT_RESOLUTION_MEDIUM;
-    freenect_depth_format depth_format = FREENECT_DEPTH_11BIT;
+    freenect_depth_format depth_format = FREENECT_DEPTH_MM;
 
     //Set depth and video modes
     if(freenect_set_depth_mode(m_fdev_ptr, freenect_find_depth_mode(resolution, depth_format)))
@@ -333,7 +333,7 @@ void KinectBackend::depth_callback(freenect_device *fdev_ptr, void *data, unsign
     {
         for(int j = 0; j < KinectBackend::getInstance().m_resolution[0]; j++)
         {
-            unsigned short current_depth = depth_ptr[(KinectBackend::getInstance().m_resolution[0] * i) + j];
+            unsigned short current_depth = depth_ptr[(KinectBackend::getInstance().m_resolution[0] * i) + j] >> 3;
 
             int pixel_value = KinectBackend::getInstance().m_gamma[current_depth];
 
