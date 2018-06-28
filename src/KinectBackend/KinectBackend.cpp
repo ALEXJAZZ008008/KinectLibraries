@@ -10,7 +10,7 @@ KinectBackend::KinectBackend():
     m_depth_output(""),
     m_video_output(""),
     m_resolution(),
-    m_reset_camera_tilt(-20.0),
+    m_reset_camera_tilt(0.0),
     m_stored_camera_tilt(0.0),
     m_increment(2.0),
     m_num_devices(0)
@@ -285,7 +285,7 @@ void KinectBackend::depth_callback(freenect_device *fdev_ptr, void *data, unsign
     {
         for(int j = 0; j < KinectBackend::getInstance().m_resolution[0]; j++)
         {
-            KinectBackend::getInstance().m_depth[j][i] = depth_ptr[(KinectBackend::getInstance().m_resolution[0] * i) + j] >> 3;
+            KinectBackend::getInstance().m_depth[j][i] = depth_ptr[(KinectBackend::getInstance().m_resolution[0] * i) + j];
 
             depth_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_depth[j][i]), sizeof(unsigned short));
         }
