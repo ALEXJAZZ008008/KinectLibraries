@@ -4,9 +4,10 @@
 #define _USE_MATH_DEFINES
 
 #include <math.h>
-#include <fstream>
+#include <array>
 #include <string>
 
+#include "src/include/KinectObject.h"
 #include "libfreenect.h"
 
 using namespace std;
@@ -35,15 +36,10 @@ public:
     KinectBackend(KinectBackend &&) = delete;
     void operator = (KinectBackend &&) = delete;
 
-    //! Updates the callback functions,
-    //! must be called at regular intervals
-    int update();
-
-    //! Create connections
-    int kinect_backend_main();
-
-    //! Disconnect or destruct remotely
-    int kinect_backend_kill();
+    inline KinectObject * get_kinect_object_ptr()
+    {
+        return m_kinect_object_ptr;
+    }
 
     //! Returns output
     string get_output();
@@ -56,7 +52,7 @@ public:
     {
         m_depth_output += depth_output;
 
-        return 0;
+        return 1;
     }
 
     //! Returns video output
@@ -67,7 +63,7 @@ public:
     {
         m_video_output += video_output;
 
-        return 0;
+        return 1;
     }
 
     //! Returns stored camera tilt
@@ -79,6 +75,16 @@ public:
     //! Sets stored current camera tilt
     int set_stored_camera_tilt(double);
 
+    //! Updates the callback functions,
+    //! must be called at regular intervals
+    int update();
+
+    //! Create connections
+    int kinect_backend_main();
+
+    //! Disconnect or destruct remotely
+    int kinect_backend_kill(bool);
+
 private:
 
     //! Constructor,
@@ -89,6 +95,8 @@ private:
     //! currently private as class is static
     ~KinectBackend();
 
+    KinectObject *m_kinect_object_ptr;
+
     //! Holds information about the usb context.
     freenect_context *m_fctx_ptr;
 
@@ -98,10 +106,6 @@ private:
     //! Current tilt state.
     freenect_raw_tilt_state *m_current_tilt_state_ptr;
 
-    unsigned short m_depth[1280][1024];
-
-    unsigned char m_video[1280][1024][3];
-
     //! General output
     string m_output;
 
@@ -110,8 +114,6 @@ private:
 
     //! Video output
     string m_video_output;
-
-    unsigned short m_resolution[2];
 
     double m_reset_camera_tilt;
 
@@ -132,7 +134,7 @@ private:
 
     //! Called by destructor
     //! and any other methods aimign to destruct the class
-    int destructor();
+    int destructor(bool);
 
     //! Updates the current state of the tilt motor
     int update_tilt_state();

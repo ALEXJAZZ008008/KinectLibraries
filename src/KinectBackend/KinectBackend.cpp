@@ -1,15 +1,13 @@
 #include "src/include/KinectBackend.h"
 
 KinectBackend::KinectBackend():
+    m_kinect_object_ptr(new KinectObject()),
     m_fctx_ptr(nullptr),
     m_fdev_ptr(nullptr),
     m_current_tilt_state_ptr(nullptr),
-    m_depth(),
-    m_video(),
     m_output(""),
     m_depth_output(""),
     m_video_output(""),
-    m_resolution(),
     m_reset_camera_tilt(0.0),
     m_stored_camera_tilt(0.0),
     m_increment(2.0),
@@ -20,7 +18,7 @@ KinectBackend::KinectBackend():
 
 KinectBackend::~KinectBackend()
 {
-    destructor();
+    destructor(true);
 }
 
 KinectBackend & KinectBackend::getInstance( )
@@ -93,29 +91,29 @@ int KinectBackend::kinect_backend_main()
     {
     case FREENECT_RESOLUTION_LOW:
 
-        m_resolution[0] = 320;
-        m_resolution[1] = 240;
+        m_kinect_object_ptr->get_resolution().at(0) = 320;
+        m_kinect_object_ptr->get_resolution().at(1) = 240;
 
         break;
 
     case FREENECT_RESOLUTION_MEDIUM:
 
-        m_resolution[0] = 640;
-        m_resolution[1] = 480;
+        m_kinect_object_ptr->get_resolution().at(0) = 640;
+        m_kinect_object_ptr->get_resolution().at(1) = 480;
 
         break;
 
     case FREENECT_RESOLUTION_HIGH:
 
-        m_resolution[0] = 1280;
-        m_resolution[1] = 1024;
+        m_kinect_object_ptr->get_resolution().at(0) = 1280;
+        m_kinect_object_ptr->get_resolution().at(1) = 1024;
 
         break;
 
     default:
 
-        m_resolution[0] = 0;
-        m_resolution[1] = 0;
+        m_kinect_object_ptr->get_resolution().at(0) = 0;
+        m_kinect_object_ptr->get_resolution().at(1) = 0;
 
         break;
     }
@@ -147,9 +145,9 @@ int KinectBackend::kinect_backend_main()
     return 1;
 }
 
-int KinectBackend::kinect_backend_kill()
+int KinectBackend::kinect_backend_kill(bool hard)
 {
-    destructor();
+    destructor(hard);
 
     return 1;
 }
@@ -165,25 +163,35 @@ string KinectBackend::get_output()
 
 string KinectBackend::get_depth_output()
 {
-    string output = m_depth_output;
+    string depth_output = m_depth_output;
 
     m_depth_output = "";
 
-    return output;
+    return depth_output;
 }
 
 string KinectBackend::get_video_output()
 {
-    string output = m_video_output;
+    string video_output = m_video_output;
 
     m_video_output = "";
 
-    return output;
+    return video_output;
 }
 
-int KinectBackend::destructor()
+int KinectBackend::destructor(bool hard)
 {
     set_device_camera_tilt(m_reset_camera_tilt);
+
+    if(hard)
+    {
+        if(m_kinect_object_ptr != nullptr)
+        {
+            delete m_kinect_object_ptr;
+
+            m_kinect_object_ptr = nullptr;
+        }
+    }
 
     if(m_fdev_ptr != nullptr)
     {
@@ -278,20 +286,17 @@ void KinectBackend::depth_callback(freenect_device *fdev_ptr, void *data, unsign
 {
     unsigned short *depth_ptr = (unsigned short *)data;
 
-    ofstream depth_stream;
-    depth_stream.open("depth_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
-
-    for(int i = 0; i < KinectBackend::getInstance().m_resolution[1]; i++)
+    for(int i = 0; i < KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(1); i++)
     {
-        for(int j = 0; j < KinectBackend::getInstance().m_resolution[0]; j++)
+        for(int j = 0; j < KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(0); j++)
         {
-            KinectBackend::getInstance().m_depth[j][i] = depth_ptr[(KinectBackend::getInstance().m_resolution[0] * i) + j];
-
-            depth_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_depth[j][i]), sizeof(unsigned short));
+            KinectBackend::getInstance().m_kinect_object_ptr->get_depth().at(j).at(i) = depth_ptr[(KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(0) * i) + j];
         }
     }
 
-    depth_stream.close();
+    KinectBackend::getInstance().m_kinect_object_ptr->set_timestamp(timestamp);
+
+    KinectBackend::getInstance().m_kinect_object_ptr->set_got_depth(true);
 
     KinectBackend::getInstance().append_depth_output("Received depth frame at " + to_string(timestamp) + "\n");
 }
@@ -300,26 +305,24 @@ void KinectBackend::video_callback(freenect_device *fdev_ptr, void *data_ptr, un
 {
     unsigned char *video_ptr = static_cast<unsigned char *>(data_ptr);
 
-    unsigned char average = 0;
-
-    ofstream video_stream;
-    video_stream.open("video_" + to_string(timestamp) + ".bin", ios::out | ios::binary);
-
-    for(int i = 0; i < KinectBackend::getInstance().m_resolution[1]; i++)
+    for(int i = 0; i < KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(1); i++)
     {
-        for(int j = 0; j < KinectBackend::getInstance().m_resolution[0]; j++)
+        for(int j = 0; j < KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(0); j++)
         {
-            KinectBackend::getInstance().m_video[j][i][0] = video_ptr[((KinectBackend::getInstance().m_resolution[0] * i) + j) * 3];
-            KinectBackend::getInstance().m_video[j][i][1] = video_ptr[(((KinectBackend::getInstance().m_resolution[0] * i) + j) * 3) + 1];
-            KinectBackend::getInstance().m_video[j][i][2] = video_ptr[(((KinectBackend::getInstance().m_resolution[0] * i) + j) * 3) + 2];
+            KinectBackend::getInstance().m_kinect_object_ptr->get_video().at(j).at(i).at(0) =
+                    video_ptr[((KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(0) * i) + j) * 3];
 
-            video_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_video[j][i][0]), sizeof(unsigned char));
-            video_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_video[j][i][1]), sizeof(unsigned char));
-            video_stream.write(reinterpret_cast<char *>(&KinectBackend::getInstance().m_video[j][i][2]), sizeof(unsigned char));
+            KinectBackend::getInstance().m_kinect_object_ptr->get_video().at(j).at(i).at(1) =
+                    video_ptr[(((KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(0) * i) + j) * 3) + 1];
+
+            KinectBackend::getInstance().m_kinect_object_ptr->get_video().at(j).at(i).at(2) =
+                    video_ptr[(((KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(0) * i) + j) * 3) + 2];
         }
     }
 
-    video_stream.close();
+    KinectBackend::getInstance().m_kinect_object_ptr->set_timestamp(timestamp);
+
+    KinectBackend::getInstance().m_kinect_object_ptr->set_got_video(true);
 
     KinectBackend::getInstance().append_video_output("Received video frame at "  + to_string(timestamp) + "\n");
 }

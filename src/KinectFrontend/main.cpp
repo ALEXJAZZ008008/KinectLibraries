@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     a.setApplicationVersion(QObject::tr("0.0.1"));
 
     KinectFrontend kinect_frontend;
-    kinect_frontend.show();
+    kinect_frontend.kinect_frontend_main();
 
     return a.exec();
 }

@@ -116,6 +116,8 @@ endif()
  set(CMAKE_AUTORCC ON)
  set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+ # add_library(KinectObject "")
+ # add_library(KinectInputOutput "")
 # add_library(KinectBackend "")
 
 include_directories(src/include)

@@ -1,0 +1,13 @@
+PROJECT(KinectObject VERSION 0.0 LANGUAGES CXX)
+
+add_library(KinectObject ${CMAKE_CURRENT_LIST_DIR})
+
+target_link_libraries(KinectObject) 
+
+target_sources(KinectObject 
+	PRIVATE
+	"${CMAKE_CURRENT_LIST_DIR}/KinectObject.cpp"
+    # "${CMAKE_CURRENT_LIST_DIR}/KinectObject.h"
+    ) 
+
+install(TARGETS KinectObject DESTINATION lib)
