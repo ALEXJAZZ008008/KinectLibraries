@@ -1,12 +1,14 @@
 #include "src/include/KinectBackend.h"
 
 KinectBackend::KinectBackend():
+    m_kinect_object_ptr(new KinectObject()),
     m_fctx_ptr(nullptr),
     m_fdev_ptr(nullptr),
     m_current_tilt_state_ptr(nullptr),
     m_output(""),
     m_depth_output(""),
     m_video_output(""),
+    m_reset_camera_tilt(0.0),
     m_stored_camera_tilt(0.0),
     m_increment(2.0),
     m_num_devices(0)
@@ -16,7 +18,7 @@ KinectBackend::KinectBackend():
 
 KinectBackend::~KinectBackend()
 {
-    destructor();
+    destructor(true);
 }
 
 KinectBackend & KinectBackend::getInstance( )
@@ -45,7 +47,7 @@ int KinectBackend::kinect_backend_main()
     }
 
     freenect_set_log_level(m_fctx_ptr, FREENECT_LOG_DEBUG);
-    freenect_select_subdevices(m_fctx_ptr, (freenect_device_flags)(FREENECT_DEVICE_MOTOR | FREENECT_DEVICE_CAMERA));
+    freenect_select_subdevices(m_fctx_ptr, static_cast<freenect_device_flags>(FREENECT_DEVICE_MOTOR | FREENECT_DEVICE_CAMERA));
 
     m_num_devices = freenect_num_devices(m_fctx_ptr);
 
@@ -68,19 +70,52 @@ int KinectBackend::kinect_backend_main()
         return -1;
     }
 
+    freenect_resolution resolution = FREENECT_RESOLUTION_MEDIUM;
+
     //Set depth and video modes
-    if(freenect_set_depth_mode(m_fdev_ptr, freenect_find_depth_mode(FREENECT_RESOLUTION_MEDIUM, FREENECT_DEPTH_11BIT)))
+    if(freenect_set_depth_mode(m_fdev_ptr, freenect_find_depth_mode(resolution, FREENECT_DEPTH_MM)))
     {
         m_output += "Unable to set depth mode!!\n";
 
         return -1;
     }
 
-    if (freenect_set_video_mode(m_fdev_ptr, freenect_find_video_mode(FREENECT_RESOLUTION_MEDIUM, FREENECT_VIDEO_RGB)))
+    if (freenect_set_video_mode(m_fdev_ptr, freenect_find_video_mode(resolution, FREENECT_VIDEO_RGB)))
     {
         m_output += "Unable to set video mode!!\n";
 
         return -1;
+    }
+
+    switch(resolution)
+    {
+    case FREENECT_RESOLUTION_LOW:
+
+        m_kinect_object_ptr->get_resolution().at(0) = 320;
+        m_kinect_object_ptr->get_resolution().at(1) = 240;
+
+        break;
+
+    case FREENECT_RESOLUTION_MEDIUM:
+
+        m_kinect_object_ptr->get_resolution().at(0) = 640;
+        m_kinect_object_ptr->get_resolution().at(1) = 480;
+
+        break;
+
+    case FREENECT_RESOLUTION_HIGH:
+
+        m_kinect_object_ptr->get_resolution().at(0) = 1280;
+        m_kinect_object_ptr->get_resolution().at(1) = 1024;
+
+        break;
+
+    default:
+
+        m_kinect_object_ptr->get_resolution().at(0) = 0;
+        m_kinect_object_ptr->get_resolution().at(1) = 0;
+
+        break;
     }
 
     //Set frame callback
@@ -101,7 +136,7 @@ int KinectBackend::kinect_backend_main()
         return -1;
     }
 
-    set_device_camera_tilt(0.0);
+    set_device_camera_tilt(m_reset_camera_tilt);
 
     freenect_set_led(m_fdev_ptr, LED_RED);
 
@@ -110,11 +145,9 @@ int KinectBackend::kinect_backend_main()
     return 1;
 }
 
-int KinectBackend::kinect_backend_kill()
+int KinectBackend::kinect_backend_kill(bool hard)
 {
-    set_device_camera_tilt(0.0);
-
-    destructor();
+    destructor(hard);
 
     return 1;
 }
@@ -130,24 +163,36 @@ string KinectBackend::get_output()
 
 string KinectBackend::get_depth_output()
 {
-    string output = m_depth_output;
+    string depth_output = m_depth_output;
 
     m_depth_output = "";
 
-    return output;
+    return depth_output;
 }
 
 string KinectBackend::get_video_output()
 {
-    string output = m_video_output;
+    string video_output = m_video_output;
 
     m_video_output = "";
 
-    return output;
+    return video_output;
 }
 
-int KinectBackend::destructor()
+int KinectBackend::destructor(bool hard)
 {
+    set_device_camera_tilt(m_reset_camera_tilt);
+
+    if(hard)
+    {
+        if(m_kinect_object_ptr != nullptr)
+        {
+            delete m_kinect_object_ptr;
+
+            m_kinect_object_ptr = nullptr;
+        }
+    }
+
     if(m_fdev_ptr != nullptr)
     {
         freenect_stop_depth(m_fdev_ptr);
@@ -238,12 +283,47 @@ int KinectBackend::set_stored_camera_tilt(double increment)
 }
 
 void KinectBackend::depth_callback(freenect_device *fdev_ptr, void *data, unsigned int timestamp)
-{    
+{
+    unsigned short *depth_ptr = (unsigned short *)data;
+
+    for(int i = 0; i < KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(1); i++)
+    {
+        for(int j = 0; j < KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(0); j++)
+        {
+            KinectBackend::getInstance().m_kinect_object_ptr->get_depth().at(j).at(i) = depth_ptr[(KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(0) * i) + j];
+        }
+    }
+
+    KinectBackend::getInstance().m_kinect_object_ptr->set_timestamp(timestamp);
+
+    KinectBackend::getInstance().m_kinect_object_ptr->set_got_depth(true);
+
     KinectBackend::getInstance().append_depth_output("Received depth frame at " + to_string(timestamp) + "\n");
 }
 
-void KinectBackend::video_callback(freenect_device *fdev_ptr, void *data, unsigned int timestamp)
+void KinectBackend::video_callback(freenect_device *fdev_ptr, void *data_ptr, unsigned int timestamp)
 {
+    unsigned char *video_ptr = static_cast<unsigned char *>(data_ptr);
+
+    for(int i = 0; i < KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(1); i++)
+    {
+        for(int j = 0; j < KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(0); j++)
+        {
+            KinectBackend::getInstance().m_kinect_object_ptr->get_video().at(j).at(i).at(0) =
+                    video_ptr[((KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(0) * i) + j) * 3];
+
+            KinectBackend::getInstance().m_kinect_object_ptr->get_video().at(j).at(i).at(1) =
+                    video_ptr[(((KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(0) * i) + j) * 3) + 1];
+
+            KinectBackend::getInstance().m_kinect_object_ptr->get_video().at(j).at(i).at(2) =
+                    video_ptr[(((KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(0) * i) + j) * 3) + 2];
+        }
+    }
+
+    KinectBackend::getInstance().m_kinect_object_ptr->set_timestamp(timestamp);
+
+    KinectBackend::getInstance().m_kinect_object_ptr->set_got_video(true);
+
     KinectBackend::getInstance().append_video_output("Received video frame at "  + to_string(timestamp) + "\n");
 }
 
