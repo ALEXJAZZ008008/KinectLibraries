@@ -4,7 +4,6 @@ language: cpp
 cache: ccache
 
 # Environment variables:
-# To avoid too many builds, we mix some options (although independent tests would have been better)
 matrix:
  include:
    #### linux
@@ -12,14 +11,8 @@ matrix:
    env: EXTRA_BUILD_FLAGS="-DDOWNLOAD_LibFreenect=ON -DBUILD_DOC=OFF" CC=gcc-5 CXX=g++-5
 
    ####  osx
-   # note: cannot use OpenMP on OSX yet, see https://github.com/UCL/STIR/issues/117
  - os: osx
-   python: 3
-   env: EXTRA_BUILD_FLAGS="-DOWNLOAD_LibFreenect=1" CC=gcc CXX=g++
- - os: osx
-   osx_image: xcode9 # need that for ROOT
-   python: 3
-   env: EXTRA_BUILD_FLAGS="-DOWNLOAD_LibFreenect" CC=gcc CXX=g++
+   env: EXTRA_BUILD_FLAGS="-DDOWNLOAD_LibFreenect=ON -DBUILD_DOC=OFF" CC=gcc CXX=g++
 
 env:
   global:
@@ -38,14 +31,31 @@ addons:
     sources:
       - llvm-toolchain-trusty-5.0
     packages:
-      - libusb-1.0-0
+      - libusb-1.0-0-dev
+      - freeglut3-dev
       - qtbase5-dev
 
 # Actual compilation script
+
+before_install:
+  - |
+   if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then 
+      brew update
+      # seems to be needed on Travis due to conflicts with gcc otherwise
+      # see https://github.com/travis-ci/travis-ci/issues/8826
+      brew cask uninstall oclint
+      brew install ccache
+      export PATH="/usr/local/opt/ccache/libexec:$PATH"
+      brew install libusb
+      brew install freeglut
+      brew install qt5
+      brew link qt5 --force
+    fi   
       
 install:
   - mkdir build install
   - cd build
   - cmake $BUILD_FLAGS $EXTRA_BUILD_FLAGS -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/install ..
-  - make -j 2 all
-  - make install
+
+script:
+  - make -j 2

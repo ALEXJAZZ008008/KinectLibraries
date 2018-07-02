@@ -2,7 +2,7 @@ PROJECT(KinectBackend VERSION 0.0 LANGUAGES CXX)
 
 add_library(KinectBackend ${CMAKE_CURRENT_LIST_DIR})
 
-target_link_libraries(KinectBackend) 
+target_link_libraries(${PROJECT_NAME} ${Freenect_LIBRARY} ${LIBUSB_1_LIBRARY})
 
 target_sources(KinectBackend 
 	PRIVATE
