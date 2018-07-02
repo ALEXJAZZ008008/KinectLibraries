@@ -132,7 +132,6 @@ if((${CMAKE_CXX_COMPILER_ID} MATCHES "AppleClang") OR
         #                "${CMAKE_BINARY_DIR}/libfreenect2-build")
     endif()
 
-
     # For building the documentation only in Release mode.
     if (CMAKE_BUILD_TYPE MATCHES "^[Rr]elease")
         if (BUILD_DOC)
@@ -174,3 +173,4 @@ if((${CMAKE_CXX_COMPILER_ID} MATCHES "AppleClang") OR
 
     set(CONFIGURED_ONCE TRUE CACHE INTERNAL
         "A flag showing that CMake has configured at least once.")
+

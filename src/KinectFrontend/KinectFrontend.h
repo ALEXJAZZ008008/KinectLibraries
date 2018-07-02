@@ -8,7 +8,8 @@
 #include <QTimer>
 
 #include "ui_motor_control.h"
-#include "KinectBackend.h"
+#include "src/include/KinectBackend.h"
+#include "src/include/KinectInputOutput.h"
 
 using namespace std;
 
@@ -46,6 +47,10 @@ public:
     KinectFrontend(KinectFrontend &&);
     void operator = (KinectFrontend &&);
 
+    int kinect_frontend_main();
+
+    int kinect_frontend_kill(bool);
+
 private:
 
     //! Pointer to the UI namespace
@@ -54,12 +59,14 @@ private:
     //! Pointer to the update timer
     QTimer *m_update;
 
+    KinectInputOutput *m_kinect_input_output_ptr;
+
     //! Tracks if a camera is connected
     bool is_connected;
 
     //! Called by destructor
     //! and any other methods aimign to destruct the class
-    int destructor();
+    int destructor(bool);
 
     //! Updates the text in the UI
     int update_output();
