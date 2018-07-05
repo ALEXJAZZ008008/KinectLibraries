@@ -7,8 +7,8 @@
 #include <array>
 #include <string>
 
-#include "src/include/KinectObject.h"
 #include "libfreenect.h"
+#include "src/include/KinectObject.h"
 
 using namespace std;
 
@@ -27,7 +27,7 @@ class KinectBackend
 public:
 
     //! Return a static reference to the singleton object.
-    static KinectBackend &getInstance( );
+    static KinectBackend &getInstance();
 
     //! Copy and move constructos and assignment opperators,
     //! only here to provide delete function for singleton
@@ -39,6 +39,49 @@ public:
     inline KinectObject * get_kinect_object_ptr()
     {
         return m_kinect_object_ptr;
+    }
+
+    inline int set_kinect_object_ptr(KinectObject *kinect_object_ptr)
+    {
+        m_kinect_object_ptr = kinect_object_ptr;
+
+        return 1;
+    }
+
+    inline freenect_context * get_freenect_context_ptr()
+    {
+        return m_freenect_context_ptr;
+    }
+
+    inline int set_freenect_context_ptr(freenect_context *freenect_context_ptr)
+    {
+        m_freenect_context_ptr = freenect_context_ptr;
+
+        return 1;
+    }
+
+    inline freenect_device * get_freenect_device_ptr()
+    {
+        return m_freenect_device_ptr;
+    }
+
+    inline int set_freenect_device_ptr(freenect_device *freenect_device_ptr)
+    {
+        m_freenect_device_ptr = freenect_device_ptr;
+
+        return 1;
+    }
+
+    inline freenect_raw_tilt_state * get_current_tilt_state_ptr()
+    {
+        return m_current_tilt_state_ptr;
+    }
+
+    inline int set_current_tilt_state_ptr(freenect_raw_tilt_state *current_tilt_state_ptr)
+    {
+        m_current_tilt_state_ptr = current_tilt_state_ptr;
+
+        return 1;
     }
 
     //! Returns output
@@ -98,10 +141,10 @@ private:
     KinectObject *m_kinect_object_ptr;
 
     //! Holds information about the usb context.
-    freenect_context *m_fctx_ptr;
+    freenect_context *m_freenect_context_ptr;
 
     //! Holds device information.
-    freenect_device *m_fdev_ptr;
+    freenect_device *m_freenect_device_ptr;
 
     //! Current tilt state.
     freenect_raw_tilt_state *m_current_tilt_state_ptr;

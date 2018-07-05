@@ -8,8 +8,7 @@
 #include <QTimer>
 
 #include "ui_motor_control.h"
-#include "src/include/KinectBackend.h"
-#include "src/include/KinectInputOutput.h"
+#include "src/include/KinectInterface.h"
 
 using namespace std;
 
@@ -43,9 +42,57 @@ public:
     //! not currently implemented,
     //! only here to provide delete function in case of singleton
     KinectFrontend(KinectFrontend &);
-    void operator = (KinectFrontend &);
+    KinectFrontend & operator = (KinectFrontend &);
     KinectFrontend(KinectFrontend &&);
-    void operator = (KinectFrontend &&);
+    KinectFrontend & operator = (KinectFrontend &&);
+
+    inline Ui::motor_control * get_ui_ptr()
+    {
+        return m_ui_ptr;
+    }
+
+    inline int set_ui_ptr(Ui::motor_control *ui_ptr)
+    {
+        m_ui_ptr = ui_ptr;
+
+        return 1;
+    }
+
+    inline QTimer * get_update_ptr()
+    {
+        return m_update_ptr;
+    }
+
+    inline int set_update_ptr(QTimer * update_ptr)
+    {
+        m_update_ptr = update_ptr;
+
+        return 1;
+    }
+
+    inline KinectInterface * get_kinect_interface_ptr()
+    {
+        return m_kinect_interface_ptr;
+    }
+
+    inline int ser_kinect_interface_ptr(KinectInterface * kinect_interface_ptr)
+    {
+        m_kinect_interface_ptr = kinect_interface_ptr;
+
+        return 1;
+    }
+
+    inline bool get_is_connected()
+    {
+        return m_is_connected;
+    }
+
+    inline int set_is_connected(bool is_connected)
+    {
+        m_is_connected = is_connected;
+
+        return 1;
+    }
 
     int kinect_frontend_main();
 
@@ -57,12 +104,12 @@ private:
     Ui::motor_control *m_ui_ptr;
 
     //! Pointer to the update timer
-    QTimer *m_update;
+    QTimer *m_update_ptr;
 
-    KinectInputOutput *m_kinect_input_output_ptr;
+    KinectInterface *m_kinect_interface_ptr;
 
     //! Tracks if a camera is connected
-    bool is_connected;
+    bool m_is_connected;
 
     //! Called by destructor
     //! and any other methods aimign to destruct the class

@@ -2,10 +2,10 @@
 
 KinectFrontend::KinectFrontend(QDialog *parent):
     QDialog(parent),
-    m_ui_ptr(new Ui::motor_control),
-    m_update(new QTimer(this)),
-    m_kinect_input_output_ptr(new KinectInputOutput(KinectBackend::getInstance().get_kinect_object_ptr())),
-    is_connected(false)
+    m_ui_ptr(new Ui::motor_control()),
+    m_update_ptr(new QTimer(this)),
+    m_kinect_interface_ptr(new KinectInterface()),
+    m_is_connected(false)
 {
 
 }
@@ -13,6 +13,44 @@ KinectFrontend::KinectFrontend(QDialog *parent):
 KinectFrontend::~KinectFrontend()
 {
     destructor(true);
+}
+
+KinectFrontend::KinectFrontend(KinectFrontend &kinect_frontend_ref):
+    m_ui_ptr(kinect_frontend_ref.get_ui_ptr()),
+    m_update_ptr(kinect_frontend_ref.get_update_ptr()),
+    m_kinect_interface_ptr(kinect_frontend_ref.get_kinect_interface_ptr()),
+    m_is_connected(kinect_frontend_ref.get_is_connected())
+{
+
+}
+
+KinectFrontend & KinectFrontend::operator = (KinectFrontend &kinect_frontend_ref)
+{
+    m_ui_ptr = kinect_frontend_ref.get_ui_ptr();
+    m_update_ptr = kinect_frontend_ref.get_update_ptr();
+    m_kinect_interface_ptr = kinect_frontend_ref.get_kinect_interface_ptr();
+    m_is_connected = kinect_frontend_ref.get_is_connected();
+
+    return *this;
+}
+
+KinectFrontend::KinectFrontend(KinectFrontend &&kinect_frontend_ref_ref):
+    m_ui_ptr(kinect_frontend_ref_ref.get_ui_ptr()),
+    m_update_ptr(kinect_frontend_ref_ref.get_update_ptr()),
+    m_kinect_interface_ptr(kinect_frontend_ref_ref.get_kinect_interface_ptr()),
+    m_is_connected(kinect_frontend_ref_ref.get_is_connected())
+{
+
+}
+
+KinectFrontend & KinectFrontend::operator = (KinectFrontend &&kinect_frontend_ref_ref)
+{
+    m_ui_ptr = kinect_frontend_ref_ref.get_ui_ptr();
+    m_update_ptr = kinect_frontend_ref_ref.get_update_ptr();
+    m_kinect_interface_ptr = kinect_frontend_ref_ref.get_kinect_interface_ptr();
+    m_is_connected = kinect_frontend_ref_ref.get_is_connected();
+
+    return *this;
 }
 
 int KinectFrontend::kinect_frontend_main()
@@ -40,46 +78,46 @@ int KinectFrontend::destructor(bool hard)
         m_ui_ptr = nullptr;
     }
 
-    if(m_update != nullptr)
+    if(m_update_ptr != nullptr)
     {
-        delete m_update;
+        delete m_update_ptr;
 
-        m_update = nullptr;
+        m_update_ptr = nullptr;
     }
 
-    if(m_kinect_input_output_ptr != nullptr)
+    if(m_kinect_interface_ptr != nullptr)
     {
-        delete m_kinect_input_output_ptr;
+        delete m_kinect_interface_ptr;
 
-        m_kinect_input_output_ptr = nullptr;
+        m_kinect_interface_ptr = nullptr;
     }
 }
 
 int KinectFrontend::update_output()
 {
-    m_ui_ptr->_lbl_output_msg->insertPlainText(KinectBackend::getInstance().get_depth_output().c_str());
-    m_ui_ptr->_lbl_output_msg->insertPlainText(KinectBackend::getInstance().get_video_output().c_str());
+    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_interface_ptr->get_kinect_backend_ref().get_depth_output().c_str());
+    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_interface_ptr->get_kinect_backend_ref().get_video_output().c_str());
 
-    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_input_output_ptr->get_depth_output().c_str());
-    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_input_output_ptr->get_point_cloud_output().c_str());
-    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_input_output_ptr->get_video_output().c_str());
+    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_interface_ptr->get_kinect_input_output_ptr()->get_depth_output().c_str());
+    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_interface_ptr->get_kinect_input_output_ptr()->get_point_cloud_output().c_str());
+    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_interface_ptr->get_kinect_input_output_ptr()->get_video_output().c_str());
 
-    m_ui_ptr->_lbl_output_msg->insertPlainText(KinectBackend::getInstance().get_output().c_str());
+    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_interface_ptr->get_kinect_backend_ref().get_output().c_str());
 
     m_ui_ptr->_lbl_output_msg->moveCursor(QTextCursor::End);
 
-    m_ui_ptr->_lne_current_tilt->setText(QString::number(KinectBackend::getInstance().get_stored_camera_tilt()));
+    m_ui_ptr->_lne_current_tilt->setText(QString::number(m_kinect_interface_ptr->get_kinect_backend_ref().get_stored_camera_tilt()));
 
     return 1;
 }
 
 void KinectFrontend::update()
 {
-    if(is_connected)
+    if(m_is_connected)
     {
-        KinectBackend::getInstance().update();
+        m_kinect_interface_ptr->get_kinect_backend_ref().update();
 
-        m_kinect_input_output_ptr->kinect_input_output_main();
+        m_kinect_interface_ptr->get_kinect_input_output_ptr()->kinect_input_output_main();
 
         update_output();
     }
@@ -87,12 +125,15 @@ void KinectFrontend::update()
 
 void KinectFrontend::on__psh_connect_clicked()
 {
-    if(KinectBackend::getInstance().kinect_backend_main() > 0)
+    if(!m_is_connected)
     {
-        connect(m_update, SIGNAL(timeout()), this, SLOT(update()));
-        m_update->start(33);
+        if(m_kinect_interface_ptr->get_kinect_backend_ref().kinect_backend_main() > 0)
+        {
+            connect(m_update_ptr, SIGNAL(timeout()), this, SLOT(update()));
+            m_update_ptr->start(33);
 
-        is_connected = true;
+            m_is_connected = true;
+        }
     }
 
     update_output();
@@ -100,20 +141,23 @@ void KinectFrontend::on__psh_connect_clicked()
 
 void KinectFrontend::on__psh_disconnect_clicked()
 {
-    KinectBackend::getInstance().kinect_backend_kill(false);
+    if(m_is_connected)
+    {
+        m_kinect_interface_ptr->get_kinect_backend_ref().kinect_backend_kill(false);
 
-    m_update->stop();
+        m_update_ptr->stop();
 
-    is_connected = false;
+        m_is_connected = false;
+    }
 
     update_output();
 }
 
 void KinectFrontend::on_pushButton_clicked()
 {
-    if(is_connected)
+    if(m_is_connected)
     {
-        KinectBackend::getInstance().set_stored_camera_tilt(1.0);
+        m_kinect_interface_ptr->get_kinect_backend_ref().set_stored_camera_tilt(1.0);
 
         update_output();
     }
@@ -121,9 +165,9 @@ void KinectFrontend::on_pushButton_clicked()
 
 void KinectFrontend::on_pushButton_2_clicked()
 {
-    if(is_connected)
+    if(m_is_connected)
     {
-        KinectBackend::getInstance().set_stored_camera_tilt(-1.0);
+        m_kinect_interface_ptr->get_kinect_backend_ref().set_stored_camera_tilt(-1.0);
 
         update_output();
     }

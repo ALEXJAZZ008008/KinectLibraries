@@ -2,8 +2,11 @@
 #define KINECTINPUTOUTPUT_H
 
 #include <fstream>
+#include <string>
 
 #include "KinectObject.h"
+
+using namespace std;
 
 //!
 //! \class
@@ -15,6 +18,9 @@ class KinectInputOutput
 public:
 
     //! Constructor
+    explicit KinectInputOutput();
+
+    //! Constructor
     explicit KinectInputOutput(KinectObject *);
 
     //! Destructor
@@ -22,9 +28,16 @@ public:
 
     //! Copy and move constructos and assignment opperators
     KinectInputOutput(KinectInputOutput &);
-    void operator = (KinectInputOutput &);
+    KinectInputOutput & operator = (KinectInputOutput &);
     KinectInputOutput(KinectInputOutput &&);
-    void operator = (KinectInputOutput &&);
+    KinectInputOutput & operator = (KinectInputOutput &&);
+
+    inline int set_kinect_object(KinectObject *kinect_object_ptr)
+    {
+        m_kinect_object_ptr = kinect_object_ptr;
+
+        return 1;
+    }
 
     //! Returns depth output
     string get_depth_output();

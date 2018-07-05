@@ -1,7 +1,13 @@
 #include "KinectInputOutput.h"
 
-KinectInputOutput::KinectInputOutput(KinectObject *kinect_object):
-    m_kinect_object_ptr(kinect_object)
+KinectInputOutput::KinectInputOutput():
+    m_kinect_object_ptr(nullptr)
+{
+
+}
+
+KinectInputOutput::KinectInputOutput(KinectObject *kinect_object_ptr):
+    m_kinect_object_ptr(kinect_object_ptr)
 {
 
 }

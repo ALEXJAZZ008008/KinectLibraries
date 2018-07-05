@@ -22,13 +22,20 @@ public:
 
     //! Copy and move constructos and assignment opperators
     KinectObject(KinectObject &);
-    void operator = (KinectObject &);
+    KinectObject & operator = (KinectObject &);
     KinectObject(KinectObject &&);
-    void operator = (KinectObject &&);
+    KinectObject & operator = (KinectObject &&);
 
     inline array<array<unsigned short, 1024>, 1280> & get_depth()
     {
         return m_depth;
+    }
+
+    inline int set_depth(array<array<unsigned short, 1024>, 1280> &depth)
+    {
+        m_depth = depth;
+
+        return 1;
     }
 
     inline array<array<array<unsigned char, 3>, 1024>, 1280> & get_video()
@@ -36,9 +43,23 @@ public:
         return m_video;
     }
 
+    inline int set_video(array<array<array<unsigned char, 3>, 1024>, 1280> &video)
+    {
+        m_video = video;
+
+        return 1;
+    }
+
     inline array<unsigned short, 2> & get_resolution()
     {
         return m_resolution;
+    }
+
+    inline int set_resolution(array<unsigned short, 2> &resolution)
+    {
+        m_resolution = resolution;
+
+        return 1;
     }
 
     inline unsigned int get_timestamp()
