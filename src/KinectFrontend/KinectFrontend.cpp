@@ -115,9 +115,7 @@ void KinectFrontend::update()
 {
     if(m_is_connected)
     {
-        m_kinect_interface_ptr->get_kinect_backend_ref().update();
-
-        m_kinect_interface_ptr->get_kinect_input_output_ptr()->kinect_input_output_main();
+        m_kinect_interface_ptr->update();
 
         update_output();
     }

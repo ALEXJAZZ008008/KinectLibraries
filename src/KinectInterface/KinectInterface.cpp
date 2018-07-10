@@ -5,6 +5,7 @@ KinectInterface::KinectInterface():
     m_kinect_input_output_ptr(new KinectInputOutput()),
     m_kinect_object_ptr(new KinectObject())
 {
+    m_kinect_backend_ref.set_kinect_object_ptr(m_kinect_object_ptr);
     m_kinect_input_output_ptr->set_kinect_object(m_kinect_object_ptr);
 }
 
@@ -13,7 +14,7 @@ KinectInterface::KinectInterface(KinectObject *kinect_object_ptr):
     m_kinect_input_output_ptr(new KinectInputOutput(kinect_object_ptr)),
     m_kinect_object_ptr(kinect_object_ptr)
 {
-
+    m_kinect_backend_ref.set_kinect_object_ptr(kinect_object_ptr);
 }
 
 KinectInterface::~KinectInterface()
@@ -53,14 +54,23 @@ KinectInterface & KinectInterface::operator = (KinectInterface &&kinect_interfac
     return *this;
 }
 
-int KinectInterface::kinect_backend_main()
+int KinectInterface::kinect_interface_main()
 {
     return 1;
 }
 
-int KinectInterface::kinect_backend_kill(bool hard)
+int KinectInterface::kinect_interface_kill(bool hard)
 {
     destructor(hard);
+
+    return 1;
+}
+
+int KinectInterface::update()
+{
+    m_kinect_backend_ref.update();
+
+    m_kinect_input_output_ptr->kinect_input_output_main();
 
     return 1;
 }

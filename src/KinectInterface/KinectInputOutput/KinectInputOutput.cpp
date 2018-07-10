@@ -49,7 +49,11 @@ int KinectInputOutput::kinect_input_output_main()
     if(m_kinect_object_ptr->get_got_depth() && m_kinect_object_ptr->get_got_video())
     {
         output_depth();
-        output_point_cloud();
+
+        if(m_kinect_object_ptr->get_output_offset() >= m_kinect_object_ptr->get_point_cloud_buffer().size())
+        {
+            output_point_cloud();
+        }
 
         output_video();
 
@@ -76,9 +80,9 @@ int KinectInputOutput::output_depth()
     ofstream depth_stream;
     depth_stream.open("depth_" + to_string(m_kinect_object_ptr->get_timestamp()) + ".bin", ios::out | ios::binary);
 
-    for(int i = 0; i < m_kinect_object_ptr->get_resolution().at(1); i++)
+    for(unsigned short i = 0; i < m_kinect_object_ptr->get_resolution().at(1); ++i)
     {
-        for(int j = 0; j < m_kinect_object_ptr->get_resolution().at(0); j++)
+        for(unsigned short j = 0; j < m_kinect_object_ptr->get_resolution().at(0); ++j)
         {
             depth_stream.write(reinterpret_cast<char *>(&m_kinect_object_ptr->get_depth().at(j).at(i)), sizeof(unsigned short));
         }
@@ -93,26 +97,105 @@ int KinectInputOutput::output_depth()
 
 int KinectInputOutput::output_point_cloud()
 {
+    vector<float> temporary_point_cloud(3932160, 0.0f);
+
+    vector<vector<float>>::iterator vector_vector_iterator = m_kinect_object_ptr->get_point_cloud_buffer().begin();
+
+    for(int i = 0; i < m_kinect_object_ptr->get_point_cloud_buffer().size(); ++i)
+    {
+        vector<float>::iterator vector_iterator = vector_vector_iterator->begin();
+
+        vector<float>::iterator temporary_point_cloud_iterator = temporary_point_cloud.begin();
+
+        for(unsigned short j = 0; j < m_kinect_object_ptr->get_resolution().at(1); ++j)
+        {
+            for(unsigned short k = 0; k < m_kinect_object_ptr->get_resolution().at(0); ++k)
+            {
+                *temporary_point_cloud_iterator += *vector_iterator;
+                ++temporary_point_cloud_iterator;
+                ++vector_iterator;
+
+                *temporary_point_cloud_iterator += *vector_iterator;
+                ++temporary_point_cloud_iterator;
+                ++vector_iterator;
+
+                *temporary_point_cloud_iterator += *vector_iterator;
+                ++temporary_point_cloud_iterator;
+                ++vector_iterator;
+            }
+        }
+
+        ++vector_vector_iterator;
+    }
+
+    vector<float>::iterator temporary_point_cloud_iterator = temporary_point_cloud.begin();
+
+    for(unsigned short j = 0; j < m_kinect_object_ptr->get_resolution().at(1); ++j)
+    {
+        for(unsigned short k = 0; k < m_kinect_object_ptr->get_resolution().at(0); ++k)
+        {
+            *temporary_point_cloud_iterator = (*temporary_point_cloud_iterator / m_kinect_object_ptr->get_point_cloud_buffer().size()) * -1.0f;
+            ++temporary_point_cloud_iterator;
+
+            *temporary_point_cloud_iterator = *temporary_point_cloud_iterator / m_kinect_object_ptr->get_point_cloud_buffer().size();
+            ++temporary_point_cloud_iterator;
+
+            *temporary_point_cloud_iterator = *temporary_point_cloud_iterator / m_kinect_object_ptr->get_point_cloud_buffer().size();
+            ++temporary_point_cloud_iterator;
+        }
+    }
+
     ofstream point_cloud_stream;
+
+    point_cloud_stream.open("point_cloud_" + to_string(m_kinect_object_ptr->get_timestamp()) + ".bin", ios::out | ios::binary);
+
+    temporary_point_cloud_iterator = temporary_point_cloud.begin();
+
+    for(unsigned short j = 0; j < m_kinect_object_ptr->get_resolution().at(1); ++j)
+    {
+        for(unsigned short k = 0; k < m_kinect_object_ptr->get_resolution().at(0); ++k)
+        {
+            point_cloud_stream.write(reinterpret_cast<char *>(&temporary_point_cloud_iterator), sizeof(float));
+            ++temporary_point_cloud_iterator;
+
+            point_cloud_stream.write(reinterpret_cast<char *>(&temporary_point_cloud_iterator), sizeof(float));
+            ++temporary_point_cloud_iterator;
+
+            point_cloud_stream.write(reinterpret_cast<char *>(&temporary_point_cloud_iterator), sizeof(float));
+            ++temporary_point_cloud_iterator;
+        }
+    }
+
+    point_cloud_stream.close();
+
     point_cloud_stream.open("point_cloud_" + to_string(m_kinect_object_ptr->get_timestamp()) + ".txt", ios::out | ios::binary);
 
     point_cloud_stream << "# .PCD v.7 - Point Cloud Data file format" << endl;
     point_cloud_stream << "VERSION .7" << endl;
     point_cloud_stream << "FIELDS x y z" << endl;
-    point_cloud_stream << "SIZE 2 2 2" << endl;
-    point_cloud_stream << "TYPE U U U" << endl;
+    point_cloud_stream << "SIZE 4 4 4" << endl;
+    point_cloud_stream << "TYPE F F F" << endl;
     point_cloud_stream << "COUNT 1 1 1" << endl;
-    point_cloud_stream << "WIDTH 640" << endl;
-    point_cloud_stream << "HEIGHT 480" << endl;
+    point_cloud_stream << "WIDTH " << to_string(m_kinect_object_ptr->get_resolution().at(0) * m_kinect_object_ptr->get_resolution().at(1)) << endl;
+    point_cloud_stream << "HEIGHT 1" << endl;
     point_cloud_stream << "VIEWPOINT 0 0 0 1 0 0 0" << endl;
-    point_cloud_stream << "POINTS 307200" << endl;
+    point_cloud_stream << "POINTS " << to_string(m_kinect_object_ptr->get_resolution().at(0) * m_kinect_object_ptr->get_resolution().at(1)) << endl;
     point_cloud_stream << "DATA ascii" << endl;
 
-    for(unsigned short i = 0; i < m_kinect_object_ptr->get_resolution().at(1); i++)
+    temporary_point_cloud_iterator = temporary_point_cloud.begin();
+
+    for(unsigned short j = 0; j < m_kinect_object_ptr->get_resolution().at(1); ++j)
     {
-        for(unsigned short j = 0; j < m_kinect_object_ptr->get_resolution().at(0); j++)
+        for(unsigned short k = 0; k < m_kinect_object_ptr->get_resolution().at(0); ++k)
         {
-            point_cloud_stream << j << " " << i << " " << m_kinect_object_ptr->get_depth().at(j).at(i) << endl;
+            point_cloud_stream << to_string(*temporary_point_cloud_iterator) << " ";
+            ++temporary_point_cloud_iterator;
+
+            point_cloud_stream << to_string(*temporary_point_cloud_iterator) << " ";
+            ++temporary_point_cloud_iterator;
+
+            point_cloud_stream << to_string(*temporary_point_cloud_iterator) << endl;
+            ++temporary_point_cloud_iterator;
         }
     }
 
@@ -128,9 +211,9 @@ int KinectInputOutput::output_video()
     ofstream video_stream;
     video_stream.open("video_" + to_string(m_kinect_object_ptr->get_timestamp()) + ".bin", ios::out | ios::binary);
 
-    for(int i = 0; i < m_kinect_object_ptr->get_resolution().at(1); i++)
+    for(unsigned short i = 0; i < m_kinect_object_ptr->get_resolution().at(1); ++i)
     {
-        for(int j = 0; j < m_kinect_object_ptr->get_resolution().at(0); j++)
+        for(unsigned short j = 0; j < m_kinect_object_ptr->get_resolution().at(0); ++j)
         {
             video_stream.write(reinterpret_cast<char *>(&m_kinect_object_ptr->get_video().at(j).at(i).at(0)), sizeof(unsigned char));
             video_stream.write(reinterpret_cast<char *>(&m_kinect_object_ptr->get_video().at(j).at(i).at(1)), sizeof(unsigned char));
@@ -149,8 +232,6 @@ int KinectInputOutput::destructor(bool hard)
 {
     if(m_kinect_object_ptr != nullptr)
     {
-        delete m_kinect_object_ptr;
-
         m_kinect_object_ptr = nullptr;
     }
 

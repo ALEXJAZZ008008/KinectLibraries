@@ -1,10 +1,6 @@
 #ifndef KINECTBACKEND_H
 #define KINECTBACKEND_H
 
-#define _USE_MATH_DEFINES
-
-#include <math.h>
-#include <array>
 #include <string>
 
 #include "libfreenect.h"
@@ -118,21 +114,23 @@ public:
     //! Sets stored current camera tilt
     int set_stored_camera_tilt(double);
 
-    //! Updates the callback functions,
-    //! must be called at regular intervals
-    int update();
-
     //! Create connections
     int kinect_backend_main();
 
     //! Disconnect or destruct remotely
     int kinect_backend_kill(bool);
 
+    //! Updates the callback functions,
+    //! must be called at regular intervals
+    int update();
+
 private:
 
     //! Constructor,
     //! currently private as class is static
     explicit KinectBackend();
+
+    explicit KinectBackend(KinectObject *);
 
     //! Destructor,
     //! currently private as class is static
@@ -169,15 +167,17 @@ private:
     //! Number of devices connected to the PC.
     int m_num_devices;
 
+    //! Called by destructor
+    //! and any other methods aimign to destruct the class
+    int destructor(bool);
+
     //! Call back for depth information
     static void depth_callback(freenect_device *, void *, unsigned int);
 
     //! Call back for video information
     static void video_callback(freenect_device *, void *, unsigned int);
 
-    //! Called by destructor
-    //! and any other methods aimign to destruct the class
-    int destructor(bool);
+    int calculate_point_cloud();
 
     //! Updates the current state of the tilt motor
     int update_tilt_state();

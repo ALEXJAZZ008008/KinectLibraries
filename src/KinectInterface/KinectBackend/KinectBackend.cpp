@@ -1,7 +1,23 @@
 #include "src/include/KinectBackend.h"
 
 KinectBackend::KinectBackend():
-    m_kinect_object_ptr(new KinectObject()),
+    m_kinect_object_ptr(nullptr),
+    m_freenect_context_ptr(nullptr),
+    m_freenect_device_ptr(nullptr),
+    m_current_tilt_state_ptr(nullptr),
+    m_output(""),
+    m_depth_output(""),
+    m_video_output(""),
+    m_reset_camera_tilt(0.0),
+    m_stored_camera_tilt(0.0),
+    m_increment(2.0),
+    m_num_devices(0)
+{
+
+}
+
+KinectBackend::KinectBackend(KinectObject *kinect_object_ptr):
+    m_kinect_object_ptr(kinect_object_ptr),
     m_freenect_context_ptr(nullptr),
     m_freenect_device_ptr(nullptr),
     m_current_tilt_state_ptr(nullptr),
@@ -28,11 +44,92 @@ KinectBackend & KinectBackend::getInstance( )
     return instance;
 }
 
-int KinectBackend::update()
+string KinectBackend::get_output()
 {
-    freenect_process_events(m_freenect_context_ptr);
+    string output = m_output;
 
-    return 1;
+    m_output = "";
+
+    return output;
+}
+
+string KinectBackend::get_depth_output()
+{
+    string depth_output = m_depth_output;
+
+    m_depth_output = "";
+
+    return depth_output;
+}
+
+string KinectBackend::get_video_output()
+{
+    string video_output = m_video_output;
+
+    m_video_output = "";
+
+    return video_output;
+}
+
+int KinectBackend::set_stored_camera_tilt(double increment)
+{
+    update_tilt_state();
+
+    freenect_tilt_status_code tilt_state = freenect_get_tilt_status(m_current_tilt_state_ptr);
+
+    double current_camera_tilt = get_device_camera_tilt();
+
+    switch(tilt_state)
+    {
+    case freenect_tilt_status_code::TILT_STATUS_MOVING:
+
+        m_output += "Unable to tilt the camera!!\n";
+
+        return -1;
+
+    case freenect_tilt_status_code::TILT_STATUS_LIMIT:
+
+        if(current_camera_tilt > 0)
+        {
+            if(increment < 0)
+            {
+                set_device_camera_tilt(current_camera_tilt + (m_increment * increment));
+            }
+            else
+            {
+                m_output += "Unable to tilt the camera!!\n";
+            }
+        }
+        else
+        {
+            if(increment > 0)
+            {
+                set_device_camera_tilt(current_camera_tilt + (m_increment * increment));
+            }
+            else
+            {
+                m_output += "Unable to tilt the camera!!\n";
+            }
+        }
+
+        return -1;
+
+    case freenect_tilt_status_code::TILT_STATUS_STOPPED:
+
+        set_device_camera_tilt(current_camera_tilt + (m_increment * increment));
+
+        return 1;
+
+    default:
+
+        m_output += "Unable to tilt the camera!!\n";
+
+        set_device_camera_tilt(0.0);
+
+        return -1;
+    }
+
+    return -1;
 }
 
 int KinectBackend::kinect_backend_main()
@@ -152,43 +249,29 @@ int KinectBackend::kinect_backend_kill(bool hard)
     return 1;
 }
 
-string KinectBackend::get_output()
+int KinectBackend::update()
 {
-    string output = m_output;
+    freenect_process_events(m_freenect_context_ptr);
 
-    m_output = "";
+    if(m_kinect_object_ptr->get_got_depth())
+    {
+        calculate_point_cloud();
+    }
 
-    return output;
-}
-
-string KinectBackend::get_depth_output()
-{
-    string depth_output = m_depth_output;
-
-    m_depth_output = "";
-
-    return depth_output;
-}
-
-string KinectBackend::get_video_output()
-{
-    string video_output = m_video_output;
-
-    m_video_output = "";
-
-    return video_output;
+    return 1;
 }
 
 int KinectBackend::destructor(bool hard)
 {
-    set_device_camera_tilt(m_reset_camera_tilt);
+    if(m_freenect_device_ptr != nullptr)
+    {
+        set_device_camera_tilt(m_reset_camera_tilt);
+    }
 
     if(hard)
     {
         if(m_kinect_object_ptr != nullptr)
         {
-            delete m_kinect_object_ptr;
-
             m_kinect_object_ptr = nullptr;
         }
     }
@@ -221,74 +304,13 @@ int KinectBackend::destructor(bool hard)
     return 1;
 }
 
-int KinectBackend::set_stored_camera_tilt(double increment)
-{
-    update_tilt_state();
-
-    freenect_tilt_status_code tilt_state = freenect_get_tilt_status(m_current_tilt_state_ptr);
-
-    double current_camera_tilt = get_device_camera_tilt();
-
-    switch(tilt_state)
-    {
-    case freenect_tilt_status_code::TILT_STATUS_MOVING:
-
-        m_output += "Unable to tilt the camera!!\n";
-
-        return -1;
-
-    case freenect_tilt_status_code::TILT_STATUS_LIMIT:
-
-        if(current_camera_tilt > 0)
-        {
-            if(increment < 0)
-            {
-                set_device_camera_tilt(current_camera_tilt + (m_increment * increment));
-            }
-            else
-            {
-                m_output += "Unable to tilt the camera!!\n";
-            }
-        }
-        else
-        {
-            if(increment > 0)
-            {
-                set_device_camera_tilt(current_camera_tilt + (m_increment * increment));
-            }
-            else
-            {
-                m_output += "Unable to tilt the camera!!\n";
-            }
-        }
-
-        return -1;
-
-    case freenect_tilt_status_code::TILT_STATUS_STOPPED:
-
-        set_device_camera_tilt(current_camera_tilt + (m_increment * increment));
-
-        return 1;
-
-    default:
-
-        m_output += "Unable to tilt the camera!!\n";
-
-        set_device_camera_tilt(0.0);
-
-        return -1;
-    }
-
-    return -1;
-}
-
 void KinectBackend::depth_callback(freenect_device *m_freenect_device_ptr, void *data, unsigned int timestamp)
 {
     unsigned short *depth_ptr = (unsigned short *)data;
 
-    for(int i = 0; i < KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(1); i++)
+    for(unsigned short i = 0; i < KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(1); ++i)
     {
-        for(int j = 0; j < KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(0); j++)
+        for(unsigned short j = 0; j < KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(0); ++j)
         {
             KinectBackend::getInstance().m_kinect_object_ptr->get_depth().at(j).at(i) = depth_ptr[(KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(0) * i) + j];
         }
@@ -305,9 +327,9 @@ void KinectBackend::video_callback(freenect_device *m_freenect_device_ptr, void 
 {
     unsigned char *video_ptr = static_cast<unsigned char *>(data_ptr);
 
-    for(int i = 0; i < KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(1); i++)
+    for(unsigned short i = 0; i < KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(1); ++i)
     {
-        for(int j = 0; j < KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(0); j++)
+        for(unsigned short j = 0; j < KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(0); ++j)
         {
             KinectBackend::getInstance().m_kinect_object_ptr->get_video().at(j).at(i).at(0) =
                     video_ptr[((KinectBackend::getInstance().m_kinect_object_ptr->get_resolution().at(0) * i) + j) * 3];
@@ -325,6 +347,42 @@ void KinectBackend::video_callback(freenect_device *m_freenect_device_ptr, void 
     KinectBackend::getInstance().m_kinect_object_ptr->set_got_video(true);
 
     KinectBackend::getInstance().append_video_output("Received video frame at "  + to_string(timestamp) + "\n");
+}
+
+int KinectBackend::calculate_point_cloud()
+{
+    vector<float>::iterator vector_iterator = m_kinect_object_ptr->get_point_cloud_buffer_iterator()->begin();
+
+    for(unsigned short i = 0; i < m_kinect_object_ptr->get_resolution().at(1); ++i)
+    {
+        for(unsigned short j = 0; j < m_kinect_object_ptr->get_resolution().at(0); ++j)
+        {
+            *vector_iterator = (j - (m_kinect_object_ptr->get_resolution().at(1) / 2.0f)) * (m_kinect_object_ptr->get_depth().at(j).at(i) - 10) * 0.0021f;
+            ++vector_iterator;
+
+            *vector_iterator = (i - (m_kinect_object_ptr->get_resolution().at(0) / 2.0f)) * (m_kinect_object_ptr->get_depth().at(j).at(i) - 10) * 0.0021f;
+            ++vector_iterator;
+
+            *vector_iterator = m_kinect_object_ptr->get_depth().at(j).at(i);
+            ++vector_iterator;
+        }
+    }
+
+    if(m_kinect_object_ptr->get_point_cloud_buffer_iterator() != --m_kinect_object_ptr->get_point_cloud_buffer().end())
+    {
+        ++m_kinect_object_ptr->get_point_cloud_buffer_iterator();
+    }
+    else
+    {
+        m_kinect_object_ptr->get_point_cloud_buffer_iterator() = m_kinect_object_ptr->get_point_cloud_buffer().begin();
+    }
+
+    if(m_kinect_object_ptr->get_output_offset() < m_kinect_object_ptr->get_point_cloud_buffer().size())
+    {
+        m_kinect_object_ptr->set_output_offset(m_kinect_object_ptr->get_output_offset() + 1);
+    }
+
+    return 1;
 }
 
 int KinectBackend::update_tilt_state()

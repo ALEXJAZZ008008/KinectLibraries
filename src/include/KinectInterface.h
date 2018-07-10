@@ -66,10 +66,12 @@ public:
     }
 
     //! Create connections
-    int kinect_backend_main();
+    int kinect_interface_main();
 
     //! Disconnect or destruct remotely
-    int kinect_backend_kill(bool);
+    int kinect_interface_kill(bool);
+
+    int update();
 
 private:
 
