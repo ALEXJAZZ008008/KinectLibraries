@@ -40,34 +40,34 @@ public:
     }
 
     //! Returns depth output
-    string get_depth_output();
+    string get_depth_message();
 
     //! Appends to depth output
-    inline int append_depth_output(string depth_output)
+    inline int append_depth_message(string depth_message)
     {
-        m_depth_output += depth_output;
+        m_depth_message += depth_message;
 
         return 1;
     }
 
     //! Returns point cloud output
-    string get_point_cloud_output();
+    string get_point_cloud_message();
 
     //! Appends to depth output
-    inline int append_point_cloud_output(string point_cloud_output)
+    inline int append_point_cloud_message(string point_cloud_message)
     {
-        m_point_cloud_output += point_cloud_output;
+        m_point_cloud_message += point_cloud_message;
 
         return 1;
     }
 
     //! Returns video output
-    string get_video_output();
+    string get_video_message();
 
     //! Appends to depth output
-    inline int append_video_output(string video_output)
+    inline int append_video_message(string video_message)
     {
-        m_video_output += video_output;
+        m_video_message += video_message;
 
         return 1;
     }
@@ -81,19 +81,19 @@ private:
     KinectObject *m_kinect_object_ptr;
 
     //! Depth output
-    string m_depth_output;
+    string m_depth_message;
 
     //! Depth output
-    string m_point_cloud_output;
+    string m_point_cloud_message;
 
     //! Video output
-    string m_video_output;
+    string m_video_message;
 
-    int output_depth();
+    int write_depth_to_file();
 
-    int output_point_cloud();
+    int write_point_cloud_to_file();
 
-    int output_video();
+    int write_video_to_file();
 
     int destructor(bool);
 

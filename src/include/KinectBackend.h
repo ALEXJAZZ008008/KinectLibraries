@@ -81,26 +81,26 @@ public:
     }
 
     //! Returns output
-    string get_output();
+    string get_message();
 
     //! Returns depth output
-    string get_depth_output();
+    string get_depth_message();
 
     //! Appends to depth output
-    inline int append_depth_output(string depth_output)
+    inline int append_depth_message(string depth_message)
     {
-        m_depth_output += depth_output;
+        m_depth_message += depth_message;
 
         return 1;
     }
 
     //! Returns video output
-    string get_video_output();
+    string get_video_message();
 
     //! Appends to depth output
-    inline int append_video_output(string video_output)
+    inline int append_video_message(string video_message)
     {
-        m_video_output += video_output;
+        m_video_message += video_message;
 
         return 1;
     }
@@ -148,13 +148,13 @@ private:
     freenect_raw_tilt_state *m_current_tilt_state_ptr;
 
     //! General output
-    string m_output;
+    string m_message;
 
     //! Depth output
-    string m_depth_output;
+    string m_depth_message;
 
     //! Video output
-    string m_video_output;
+    string m_video_message;
 
     double m_reset_camera_tilt;
 

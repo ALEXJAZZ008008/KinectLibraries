@@ -95,14 +95,14 @@ int KinectFrontend::destructor(bool hard)
 
 int KinectFrontend::update_output()
 {
-    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_interface_ptr->get_kinect_backend_ref().get_depth_output().c_str());
-    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_interface_ptr->get_kinect_backend_ref().get_video_output().c_str());
+    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_interface_ptr->get_kinect_backend_ref().get_depth_message().c_str());
+    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_interface_ptr->get_kinect_backend_ref().get_video_message().c_str());
 
-    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_interface_ptr->get_kinect_input_output_ptr()->get_depth_output().c_str());
-    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_interface_ptr->get_kinect_input_output_ptr()->get_point_cloud_output().c_str());
-    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_interface_ptr->get_kinect_input_output_ptr()->get_video_output().c_str());
+    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_interface_ptr->get_kinect_input_output_ptr()->get_depth_message().c_str());
+    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_interface_ptr->get_kinect_input_output_ptr()->get_point_cloud_message().c_str());
+    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_interface_ptr->get_kinect_input_output_ptr()->get_video_message().c_str());
 
-    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_interface_ptr->get_kinect_backend_ref().get_output().c_str());
+    m_ui_ptr->_lbl_output_msg->insertPlainText(m_kinect_interface_ptr->get_kinect_backend_ref().get_message().c_str());
 
     m_ui_ptr->_lbl_output_msg->moveCursor(QTextCursor::End);
 
