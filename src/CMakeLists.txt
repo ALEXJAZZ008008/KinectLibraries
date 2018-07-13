@@ -1,5 +1,5 @@
 include(src/KinectInterface/KinectObject/CMakeLists.txt)
-include(src/KinectInterface/KinectInputOutput/CMakeLists.txt)
 include(src/KinectInterface/KinectBackend/CMakeLists.txt)
+include(src/KinectInterface/KinectInputOutput/CMakeLists.txt)
 include(src/KinectInterface/CMakeLists.txt)
 include(src/KinectFrontend/CMakeLists.txt) 

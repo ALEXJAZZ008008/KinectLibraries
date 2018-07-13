@@ -4,7 +4,7 @@ include_directories(${Freenect_INCLUDE_DIR})
 
 add_executable(${PROJECT_NAME} "${CMAKE_CURRENT_LIST_DIR}/main.cpp")
 
-target_link_libraries(${PROJECT_NAME} Qt5::Core Qt5::Widgets Qt5::Gui KinectInterface KinectBackend KinectInputOutput KinectObject ${Freenect_LIBRARY} ${LIBUSB_1_LIBRARY})
+target_link_libraries(${PROJECT_NAME} Qt5::Core Qt5::Widgets Qt5::Gui KinectInterface)
 
  target_sources(KinectFrontend
     PRIVATE
