@@ -1,5 +1,5 @@
-#ifndef KINECTFRONTEND_H
-#define KINECTFRONTEND_H
+#ifndef KONNECTOR_H
+#define KONNECTOR_H
 
 #include <QDialog>
 #include <QMessageBox>
@@ -7,51 +7,57 @@
 #include <QLabel>
 #include <QTimer>
 
-#include "ui_motor_control.h"
+#include "ui_konnector.h"
 #include "src/include/KinectInterface.h"
+#include "src/KinectFrontend/Widgets/Logger/logger.h"
+#include "konnector_settings.h"
 
 using namespace std;
 
 //! Used by Qt GUI
 namespace Ui
 {
-class motor_control;
+class konnector;
 }
 
 //!
 //! \class
-//! \brief The KinectFrontend class.
+//! \brief The Konnector class.
 //! This is a Qt frontend for the KinectBackend class
 //! This class calls the KinectBackend class,
 //! collects its outputs and displays them to the user
 //! This class is capable of moving the Kinect's motor
 //!
-class KinectFrontend : public QDialog
+//! \todo Start / Stop writting frames on start acquisition
+//! \todo The output path should be taken from output_path QString
+//! \todo The outputs should be the selected by the options widget.
+//!
+class Konnector : public QDialog
 {
 
     Q_OBJECT
 
 public:
     //! Constructor
-    explicit KinectFrontend(QDialog *parent = 0);
+    explicit Konnector(QDialog *parent = 0);
 
     //! Destructor
-    ~KinectFrontend();
+    ~Konnector();
 
     //! Copy and move constructos and assignment opperators,
     //! not currently implemented,
     //! only here to provide delete function in case of singleton
-    KinectFrontend(KinectFrontend &);
-    KinectFrontend & operator = (KinectFrontend &);
-    KinectFrontend(KinectFrontend &&);
-    KinectFrontend & operator = (KinectFrontend &&);
+    Konnector(Konnector &);
+    Konnector & operator = (Konnector &);
+    Konnector(Konnector &&);
+    Konnector & operator = (Konnector &&);
 
-    inline Ui::motor_control * get_ui_ptr()
+    inline Ui::konnector * get_ui_ptr()
     {
         return m_ui_ptr;
     }
 
-    inline int set_ui_ptr(Ui::motor_control *ui_ptr)
+    inline int set_ui_ptr(Ui::konnector *ui_ptr)
     {
         m_ui_ptr = ui_ptr;
 
@@ -94,14 +100,14 @@ public:
         return 1;
     }
 
-    int kinect_frontend_main();
+    int konnector_main();
 
-    int kinect_frontend_kill(bool);
+    int konnector_kill(bool);
 
 private:
 
     //! Pointer to the UI namespace
-    Ui::motor_control *m_ui_ptr;
+    Ui::konnector *m_ui_ptr;
 
     //! Pointer to the update timer
     QTimer *m_update_ptr;
@@ -111,19 +117,44 @@ private:
     //! Tracks if a camera is connected
     bool m_is_connected;
 
+    //! True when data are acquired. Actually when saved.
+    bool m_is_acquiring;
+
     //! Called by destructor
     //! and any other methods aimign to destruct the class
     int destructor(bool);
 
     //! Updates the text in the UI
+    //! \todo Write the number of frames on ui->lbl_frames_recd
+    //! \todo Write the number of time lapsed on ui->lbl_time_lapsed
     int update_output();
 
+    //! A window to display the log
+    Logger * _logger;
+    //! Settings related with the acquisition
+    Konnector_Settings* _setts;
+
+    //! The path in which the output files will be written
+    QString _output_path;
+
 signals:
+    //! Emitted when connection status changes
+    void connection_status_changed();
+
+    //! Emitted when acquisition has started
+    void acquisition_status_changed();
 
 private slots:
 
     //! Called by timer on timeout
     void update();
+
+    //! Updates the state of the GUI
+    //! Three states considered:
+    //! - Disconnected
+    //! - Connected - idle
+    //! - Acquiring
+    void updateGUI_state();
 
     //! Event handler for Connect button
     void on__psh_connect_clicked();
@@ -131,11 +162,18 @@ private slots:
     //! Event handler for Disconnect button
     void on__psh_disconnect_clicked();
 
-    //! Event handler for Up button
-    void on_pushButton_clicked();
+    //    //! Event handler for Up button
+    //    void on_pushButton_clicked();
 
-    //! Event handler for Down button
-    void on_pushButton_2_clicked();
+    //    //! Event handler for Down button
+    //    void on_pushButton_2_clicked();
+    //! Show the log window
+    void on__psh_show_log_clicked();
+
+    //! Select the path of the output
+    //! \todo let the backend know this path
+    void on__psh_output_path_clicked();
+    void on__psh_settings_clicked();
 };
 
 #endif // KINECTFRONTEND_H
