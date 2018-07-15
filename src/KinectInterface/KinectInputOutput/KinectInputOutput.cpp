@@ -17,45 +17,41 @@ KinectInputOutput::~KinectInputOutput()
     destructor(true);
 }
 
-string KinectInputOutput::get_depth_message()
+KinectInputOutput::KinectInputOutput(KinectInputOutput &kinect_input_output_ref):
+    m_kinect_object_ptr(kinect_input_output_ref.get_kinect_object())
 {
-    string depth_message = m_depth_message;
 
-    m_depth_message = "";
-
-    return depth_message;
 }
 
-string KinectInputOutput::get_point_cloud_message()
+KinectInputOutput & KinectInputOutput::operator = (KinectInputOutput &kinect_input_output_ref)
 {
-    string point_cloud_message = m_point_cloud_message;
+    m_kinect_object_ptr = kinect_input_output_ref.get_kinect_object();
 
-    m_point_cloud_message = "";
-
-    return point_cloud_message;
+    return *this;
 }
 
-string KinectInputOutput::get_video_message()
+KinectInputOutput::KinectInputOutput(KinectInputOutput &&kinect_input_output_ref_ref):
+    m_kinect_object_ptr(kinect_input_output_ref_ref.get_kinect_object())
 {
-    string video_message = m_video_message;
 
-    m_video_message = "";
+}
 
-    return video_message;
+KinectInputOutput & KinectInputOutput::operator = (KinectInputOutput &&kinect_input_output_ref_ref)
+{
+    m_kinect_object_ptr = kinect_input_output_ref_ref.get_kinect_object();
+
+    return *this;
 }
 
 int KinectInputOutput::kinect_input_output_main()
 {
-    if(m_kinect_object_ptr->get_got_depth() && m_kinect_object_ptr->get_got_video())
+    if(m_kinect_object_ptr->get_flags().at(0) && m_kinect_object_ptr->get_flags().at(1))
     {
         write_depth_to_file();
-
-        write_point_cloud_to_file();
-
         write_video_to_file();
 
-        m_kinect_object_ptr->set_got_depth(false);
-        m_kinect_object_ptr->set_got_video(false);
+        m_kinect_object_ptr->get_flags().at(0) = false;
+        m_kinect_object_ptr->get_flags().at(1) = false;
 
         return 1;
     }
@@ -87,70 +83,7 @@ int KinectInputOutput::write_depth_to_file()
 
     depth_stream.close();
 
-    append_depth_message("Wrote depth frame to file at " + to_string(m_kinect_object_ptr->get_timestamp()) + "\n");
-
-    return 1;
-}
-
-int KinectInputOutput::write_point_cloud_to_file()
-{
-    ofstream point_cloud_stream;
-
-    point_cloud_stream.open("point_cloud_" + to_string(m_kinect_object_ptr->get_timestamp()) + ".bin", ios::out | ios::binary);
-
-    vector<float>::iterator point_cloud_iterator = m_kinect_object_ptr->get_point_cloud().begin();
-
-    for(unsigned short j = 0; j < m_kinect_object_ptr->get_resolution().at(1); ++j)
-    {
-        for(unsigned short k = 0; k < m_kinect_object_ptr->get_resolution().at(0); ++k)
-        {
-            point_cloud_stream.write(reinterpret_cast<char *>(&point_cloud_iterator), sizeof(float));
-            ++point_cloud_iterator;
-
-            point_cloud_stream.write(reinterpret_cast<char *>(&point_cloud_iterator), sizeof(float));
-            ++point_cloud_iterator;
-
-            point_cloud_stream.write(reinterpret_cast<char *>(&point_cloud_iterator), sizeof(float));
-            ++point_cloud_iterator;
-        }
-    }
-
-    point_cloud_stream.close();
-
-    point_cloud_stream.open("point_cloud_" + to_string(m_kinect_object_ptr->get_timestamp()) + ".txt", ios::out | ios::binary);
-
-    point_cloud_stream << "# .PCD v.7 - Point Cloud Data file format" << endl;
-    point_cloud_stream << "VERSION .7" << endl;
-    point_cloud_stream << "FIELDS x y z" << endl;
-    point_cloud_stream << "SIZE 4 4 4" << endl;
-    point_cloud_stream << "TYPE F F F" << endl;
-    point_cloud_stream << "COUNT 1 1 1" << endl;
-    point_cloud_stream << "WIDTH " << to_string(m_kinect_object_ptr->get_resolution().at(0) * m_kinect_object_ptr->get_resolution().at(1)) << endl;
-    point_cloud_stream << "HEIGHT 1" << endl;
-    point_cloud_stream << "VIEWPOINT 0 0 0 1 0 0 0" << endl;
-    point_cloud_stream << "POINTS " << to_string(m_kinect_object_ptr->get_resolution().at(0) * m_kinect_object_ptr->get_resolution().at(1)) << endl;
-    point_cloud_stream << "DATA ascii" << endl;
-
-    point_cloud_iterator = m_kinect_object_ptr->get_point_cloud().begin();
-
-    for(unsigned short j = 0; j < m_kinect_object_ptr->get_resolution().at(1); ++j)
-    {
-        for(unsigned short k = 0; k < m_kinect_object_ptr->get_resolution().at(0); ++k)
-        {
-            point_cloud_stream << to_string(*point_cloud_iterator) << " ";
-            ++point_cloud_iterator;
-
-            point_cloud_stream << to_string(*point_cloud_iterator) << " ";
-            ++point_cloud_iterator;
-
-            point_cloud_stream << to_string(*point_cloud_iterator) << endl;
-            ++point_cloud_iterator;
-        }
-    }
-
-    point_cloud_stream.close();
-
-    append_point_cloud_message("Wrote point cloud to file at " + to_string(m_kinect_object_ptr->get_timestamp()) + "\n");
+    m_kinect_object_ptr->get_log() += "Wrote depth frame to file at " + to_string(m_kinect_object_ptr->get_timestamp()) + "\n";
 
     return 1;
 }
@@ -172,7 +105,7 @@ int KinectInputOutput::write_video_to_file()
 
     video_stream.close();
 
-    append_video_message("Wrote video frame to file at " + to_string(m_kinect_object_ptr->get_timestamp()) + "\n");
+    m_kinect_object_ptr->get_log() += "Wrote video frame to file at " + to_string(m_kinect_object_ptr->get_timestamp()) + "\n";
 
     return 1;
 }

@@ -5,6 +5,8 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QLabel>
+#include <QFileDialog>
+#include <QSettings>
 #include <QTimer>
 
 #include "ui_konnector.h"

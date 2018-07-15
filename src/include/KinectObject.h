@@ -63,14 +63,26 @@ public:
         return 1;
     }
 
-    inline vector<float> & get_point_cloud()
+    inline array<bool, 2> & get_flags()
     {
-        return m_point_cloud;
+        return m_flags;
     }
 
-    inline int set_point_cloud(vector<float> &point_cloud)
+    inline int set_flags(array<bool, 2> &flags)
     {
-        m_point_cloud = point_cloud;
+        m_flags = flags;
+
+        return 1;
+    }
+
+    inline string & get_log()
+    {
+        return m_log;
+    }
+
+    inline int set_log(string &log)
+    {
+        m_log = log;
 
         return 1;
     }
@@ -87,30 +99,6 @@ public:
         return 1;
     }
 
-    inline bool get_got_depth()
-    {
-        return m_got_depth;
-    }
-
-    inline int set_got_depth(bool got_depth)
-    {
-        m_got_depth = got_depth;
-
-        return 1;
-    }
-
-    inline bool get_got_video()
-    {
-        return m_got_video;
-    }
-
-    inline int set_got_video(bool got_video)
-    {
-        m_got_video = got_video;
-
-        return 1;
-    }
-
     int kinect_object_main();
 
     int kinect_object_kill(bool);
@@ -123,13 +111,11 @@ private:
 
     array<unsigned short, 2> m_resolution;
 
-    vector<float> m_point_cloud;
+    array<bool, 2> m_flags;
+
+    string m_log;
 
     unsigned int m_timestamp;
-
-    bool m_got_depth;
-
-    bool m_got_video;
 
     int destructor(bool);
 

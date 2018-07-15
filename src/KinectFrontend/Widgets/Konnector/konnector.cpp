@@ -1,8 +1,5 @@
 #include "konnector.h"
 
-#include <QFileDialog>
-#include <QSettings>
-
 Konnector::Konnector(QDialog *parent):
     QDialog(parent),
     m_ui_ptr(new Ui::konnector),
@@ -117,13 +114,8 @@ int Konnector::destructor(bool hard)
 int Konnector::update_output()
 {
     string msg;
-    msg = m_kinect_interface_ptr->get_kinect_backend_ref().get_depth_message() +
-            m_kinect_interface_ptr->get_kinect_backend_ref().get_video_message() +
-            m_kinect_interface_ptr->get_kinect_input_output_ptr()->get_depth_message() +
-            m_kinect_interface_ptr->get_kinect_input_output_ptr()->get_point_cloud_message() +
-            m_kinect_interface_ptr->get_kinect_input_output_ptr()->get_video_message() +
-            m_kinect_interface_ptr->get_kinect_backend_ref().get_message() +
-            " \n" + std::to_string(m_kinect_interface_ptr->get_kinect_backend_ref().get_stored_camera_tilt()) + " \n";
+    msg = m_kinect_interface_ptr->get_kinect_object_ptr()->get_log() +
+            to_string(m_kinect_interface_ptr->get_kinect_backend_ref().get_stored_camera_tilt()) + " \n";
 
     QString q_msg(msg.c_str());
 

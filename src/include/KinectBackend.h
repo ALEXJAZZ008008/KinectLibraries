@@ -80,39 +80,50 @@ public:
         return 1;
     }
 
-    //! Returns output
-    string get_message();
-
-    //! Returns depth output
-    string get_depth_message();
-
-    //! Appends to depth output
-    inline int append_depth_message(string depth_message)
+    inline int get_reset_camera_tilt()
     {
-        m_depth_message += depth_message;
-
-        return 1;
+        return m_reset_camera_tilt;
     }
 
-    //! Returns video output
-    string get_video_message();
-
-    //! Appends to depth output
-    inline int append_video_message(string video_message)
+    inline int set_reset_camera_tilt(int reset_camera_tilt)
     {
-        m_video_message += video_message;
+        m_reset_camera_tilt = reset_camera_tilt;
 
         return 1;
     }
 
     //! Returns stored camera tilt
-    inline double get_stored_camera_tilt()
+    inline float get_stored_camera_tilt()
     {
         return m_stored_camera_tilt;
     }
 
     //! Sets stored current camera tilt
-    int set_stored_camera_tilt(double);
+    int set_stored_camera_tilt(float);
+
+    inline float get_increment()
+    {
+        return m_increment;
+    }
+
+    inline int set_increment(float increment)
+    {
+        m_increment = increment;
+
+        return 1;
+    }
+
+    inline int get_number_of_devices()
+    {
+        return m_number_of_devices;
+    }
+
+    inline int set_number_of_devices(int number_of_devices)
+    {
+        m_number_of_devices = number_of_devices;
+
+        return 1;
+    }
 
     //! Create connections
     int kinect_backend_main();
@@ -147,25 +158,16 @@ private:
     //! Current tilt state.
     freenect_raw_tilt_state *m_current_tilt_state_ptr;
 
-    //! General output
-    string m_message;
-
-    //! Depth output
-    string m_depth_message;
-
-    //! Video output
-    string m_video_message;
-
-    double m_reset_camera_tilt;
+    float m_reset_camera_tilt;
 
     //! Camera tilt
-    double m_stored_camera_tilt;
+    float m_stored_camera_tilt;
 
     //! Step of camera tilt.
-    double m_increment;
+    float m_increment;
 
     //! Number of devices connected to the PC.
-    int m_num_devices;
+    int m_number_of_devices;
 
     //! Called by destructor
     //! and any other methods aimign to destruct the class
@@ -177,16 +179,14 @@ private:
     //! Call back for video information
     static void video_callback(freenect_device *, void *, unsigned int);
 
-    int calculate_point_cloud();
-
     //! Updates the current state of the tilt motor
     int update_tilt_state();
 
     //! Gets device camera tilt
-    double get_device_camera_tilt();
+    float get_device_camera_tilt();
 
     //! Sets device camera tilt
-    int set_device_camera_tilt(double);
+    int set_device_camera_tilt(float);
 };
 
 #endif // KINECTBACKEND_H

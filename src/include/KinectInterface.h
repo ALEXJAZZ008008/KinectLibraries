@@ -34,12 +34,7 @@ public:
         return m_kinect_backend_ref;
     }
 
-    inline int set_kinect_backend_ref(KinectBackend &kinect_backend_ref)
-    {
-        throw;
-
-        return 0;
-    }
+    inline int set_kinect_backend_ref(KinectBackend &kinect_backend_ref) = delete;
 
     inline KinectInputOutput * get_kinect_input_output_ptr()
     {
