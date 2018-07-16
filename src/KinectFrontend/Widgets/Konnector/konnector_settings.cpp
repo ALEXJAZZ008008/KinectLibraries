@@ -1,10 +1,11 @@
 #include "konnector_settings.h"
 
-Konnector_Settings::Konnector_Settings(QWidget *parent) :
+Konnector_Settings::Konnector_Settings(QWidget *parent):
     QDialog(parent),
     m_ui_ptr(new Ui::Konnector_Settings)
 {
     m_ui_ptr->setupUi(this);
+
     QSettings settings;
 
     restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
@@ -83,6 +84,49 @@ Konnector_Settings::Konnector_Settings(QWidget *parent) :
 }
 
 Konnector_Settings::~Konnector_Settings()
+{
+    destructor(true);
+}
+
+Konnector_Settings::Konnector_Settings(Konnector_Settings &konector_settings_ref):
+    m_ui_ptr(konector_settings_ref.get_ui_ptr())
+{
+
+}
+
+Konnector_Settings & Konnector_Settings::operator = (Konnector_Settings &konector_settings_ref)
+{
+    m_ui_ptr = konector_settings_ref.get_ui_ptr();
+
+    return *this;
+}
+
+Konnector_Settings::Konnector_Settings(Konnector_Settings &&konector_settings_ref_ref):
+    m_ui_ptr(konector_settings_ref_ref.get_ui_ptr())
+{
+
+}
+
+Konnector_Settings & Konnector_Settings::operator = (Konnector_Settings &&konector_settings_ref_ref)
+{
+    m_ui_ptr = konector_settings_ref_ref.get_ui_ptr();
+
+    return *this;
+}
+
+int Konnector_Settings::konnector_main()
+{
+    return 1;
+}
+
+int Konnector_Settings::konnector_kill(bool hard)
+{
+    destructor(hard);
+
+    return 1;
+}
+
+int Konnector_Settings::destructor(bool hard)
 {
     if(m_ui_ptr != nullptr)
     {

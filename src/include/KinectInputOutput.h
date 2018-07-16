@@ -20,9 +20,6 @@ public:
     //! Constructor
     explicit KinectInputOutput();
 
-    //! Constructor
-    explicit KinectInputOutput(KinectObject *);
-
     //! Destructor
     ~KinectInputOutput();
 
@@ -44,6 +41,16 @@ public:
         return 1;
     }
 
+    inline int get_frames_recorded()
+    {
+        return m_frames_recorded;
+    }
+
+    inline int set_frames_recorded(int frames_recorded)
+    {
+        m_frames_recorded = frames_recorded;
+    }
+
     int kinect_input_output_main();
 
     int kinect_input_output_kill(bool);
@@ -51,6 +58,8 @@ public:
 private:
 
     KinectObject *m_kinect_object_ptr;
+
+    int m_frames_recorded;
 
     int write_depth_to_file();
 

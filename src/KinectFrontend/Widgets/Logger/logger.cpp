@@ -3,17 +3,43 @@
 
 Logger::Logger(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Logger)
+    m_ui_ptr(new Ui::Logger())
 {
-    ui->setupUi(this);
+    m_ui_ptr->setupUi(this);
 }
 
 Logger::~Logger()
 {
-    delete ui;
+    delete m_ui_ptr;
 }
 
-void Logger::print(const QString& _s)
+Logger::Logger(Logger &logger_ref):
+    m_ui_ptr(logger_ref.get_ui_ptr())
 {
-    ui->_lbl_output_msg->insertPlainText(_s);
+
+}
+
+Logger & Logger::operator = (Logger &logger_ref)
+{
+    m_ui_ptr = logger_ref.get_ui_ptr();
+
+    return *this;
+}
+
+Logger::Logger(Logger &&logger_ref_ref):
+    m_ui_ptr(logger_ref_ref.get_ui_ptr())
+{
+
+}
+
+Logger & Logger::operator = (Logger &&logger_ref_ref)
+{
+    m_ui_ptr = logger_ref_ref.get_ui_ptr();
+
+    return *this;
+}
+
+void Logger::print(const QString& string)
+{
+    m_ui_ptr->_lbl_output_msg->insertPlainText(string);
 }

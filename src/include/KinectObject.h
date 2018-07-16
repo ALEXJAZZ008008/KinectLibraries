@@ -1,8 +1,8 @@
 #ifndef KINECTOBJECT_H
 #define KINECTOBJECT_H
 
-#include <array>
 #include <vector>
+#include <string>
 
 using namespace std;
 
@@ -27,48 +27,48 @@ public:
     KinectObject(KinectObject &&);
     KinectObject & operator = (KinectObject &&);
 
-    inline array<array<unsigned short, 1024>, 1280> & get_depth()
+    inline vector<unsigned short> & get_depth()
     {
         return m_depth;
     }
 
-    inline int set_depth(array<array<unsigned short, 1024>, 1280> &depth)
+    inline int set_depth(vector<unsigned short> &depth)
     {
         m_depth = depth;
 
         return 1;
     }
 
-    inline array<array<array<unsigned char, 3>, 1024>, 1280> & get_video()
+    inline vector<unsigned char> & get_video()
     {
         return m_video;
     }
 
-    inline int set_video(array<array<array<unsigned char, 3>, 1024>, 1280> &video)
+    inline int set_video(vector<unsigned char> &video)
     {
         m_video = video;
 
         return 1;
     }
 
-    inline array<unsigned short, 2> & get_resolution()
+    inline vector<unsigned short> & get_resolution()
     {
         return m_resolution;
     }
 
-    inline int set_resolution(array<unsigned short, 2> &resolution)
+    inline int set_resolution(vector<unsigned short> &resolution)
     {
         m_resolution = resolution;
 
         return 1;
     }
 
-    inline array<bool, 2> & get_flags()
+    inline vector<bool> & get_flags()
     {
         return m_flags;
     }
 
-    inline int set_flags(array<bool, 2> &flags)
+    inline int set_flags(vector<bool> &flags)
     {
         m_flags = flags;
 
@@ -105,13 +105,13 @@ public:
 
 private:
 
-    array<array<unsigned short, 1024>, 1280> m_depth;
+    vector<unsigned short> m_depth;
 
-    array<array<array<unsigned char, 3>, 1024>, 1280> m_video;
+    vector<unsigned char> m_video;
 
-    array<unsigned short, 2> m_resolution;
+    vector<unsigned short> m_resolution;
 
-    array<bool, 2> m_flags;
+    vector<bool> m_flags;
 
     string m_log;
 

@@ -17,9 +17,6 @@ public:
     //! Constructor,
     explicit KinectInterface();
 
-    //! Constructor,
-    explicit KinectInterface(KinectObject *);
-
     //! Destructor,
     ~KinectInterface();
 

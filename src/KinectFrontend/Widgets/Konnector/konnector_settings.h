@@ -20,13 +20,31 @@ public:
     explicit Konnector_Settings(QWidget *parent = 0);
     ~Konnector_Settings();
 
-    inline Ui::Konnector_Settings * get_ui()
+    Konnector_Settings(Konnector_Settings &);
+    Konnector_Settings & operator = (Konnector_Settings &);
+    Konnector_Settings(Konnector_Settings &&);
+    Konnector_Settings & operator = (Konnector_Settings &&);
+
+    inline Ui::Konnector_Settings * get_ui_ptr()
     {
         return m_ui_ptr;
     }
 
+    inline int set_ui_ptr(Ui::Konnector_Settings *ui_ptr)
+    {
+        m_ui_ptr = ui_ptr;
+    }
+
+    int konnector_main();
+
+    int konnector_kill(bool);
+
 private:
     Ui::Konnector_Settings *m_ui_ptr;
+
+    //! Called by destructor
+    //! and any other methods aiming to destruct the class
+    int destructor(bool);
 
 private slots:
     void on_buttonBox_accepted();

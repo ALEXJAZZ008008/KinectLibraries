@@ -15,10 +15,36 @@ public:
     explicit Logger(QWidget *parent = 0);
     ~Logger();
 
+    //! Copy and move constructos and assignment opperators,
+    Logger(Logger &);
+    Logger & operator = (Logger &);
+    Logger(Logger &&);
+    Logger & operator = (Logger &&);
+
+    inline Ui::Logger * get_ui_ptr()
+    {
+        return m_ui_ptr;
+    }
+
+    inline int set_ui_ptr(Ui::Logger * ui_ptr)
+    {
+        m_ui_ptr = ui_ptr;
+
+        return 1;
+    }
+
+    int konnector_main();
+
+    int konnector_kill(bool);
+
     void print(const QString& _s);
 
 private:
-    Ui::Logger *ui;
+    Ui::Logger *m_ui_ptr;
+
+    //! Called by destructor
+    //! and any other methods aiming to destruct the class
+    int destructor(bool);
 };
 
 #endif // LOGGER_H

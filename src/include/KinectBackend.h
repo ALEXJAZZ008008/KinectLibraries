@@ -141,8 +141,6 @@ private:
     //! currently private as class is static
     explicit KinectBackend();
 
-    explicit KinectBackend(KinectObject *);
-
     //! Destructor,
     //! currently private as class is static
     ~KinectBackend();

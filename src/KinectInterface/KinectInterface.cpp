@@ -9,14 +9,6 @@ KinectInterface::KinectInterface():
     m_kinect_input_output_ptr->set_kinect_object(m_kinect_object_ptr);
 }
 
-KinectInterface::KinectInterface(KinectObject *kinect_object_ptr):
-    m_kinect_backend_ref(KinectBackend::getInstance()),
-    m_kinect_input_output_ptr(new KinectInputOutput(kinect_object_ptr)),
-    m_kinect_object_ptr(kinect_object_ptr)
-{
-    m_kinect_backend_ref.set_kinect_object_ptr(kinect_object_ptr);
-}
-
 KinectInterface::~KinectInterface()
 {
     destructor(true);

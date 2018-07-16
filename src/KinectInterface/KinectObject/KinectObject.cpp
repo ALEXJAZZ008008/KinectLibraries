@@ -1,10 +1,10 @@
 #include "src/include/KinectObject.h"
 
 KinectObject::KinectObject():
-    m_depth(),
-    m_video(),
-    m_resolution(),
-    m_flags(),
+    m_depth(0, 0),
+    m_video(0, 0),
+    m_resolution(2, 0),
+    m_flags(2, false),
     m_log(""),
     m_timestamp(0)
 {
