@@ -3,7 +3,6 @@
 KinectObject::KinectObject():
     m_depth(0, 0),
     m_video(0, 0),
-    m_resolution(2, 0),
     m_flags(2, false),
     m_log(""),
     m_timestamp(0)
@@ -19,7 +18,6 @@ KinectObject::~KinectObject()
 KinectObject::KinectObject(KinectObject &kinect_object_ref):
     m_depth(kinect_object_ref.get_depth()),
     m_video(kinect_object_ref.get_video()),
-    m_resolution(kinect_object_ref.get_resolution()),
     m_flags(kinect_object_ref.get_flags()),
     m_log(kinect_object_ref.get_log()),
     m_timestamp(kinect_object_ref.get_timestamp())
@@ -31,7 +29,6 @@ KinectObject & KinectObject::operator = (KinectObject &kinect_object_ref)
 {
     m_depth = kinect_object_ref.get_depth();
     m_video = kinect_object_ref.get_video();
-    m_resolution = kinect_object_ref.get_resolution();
     m_flags = kinect_object_ref.get_flags();
     m_log = kinect_object_ref.get_log();
     m_timestamp = kinect_object_ref.get_timestamp();
@@ -42,7 +39,6 @@ KinectObject & KinectObject::operator = (KinectObject &kinect_object_ref)
 KinectObject::KinectObject(KinectObject &&kinect_object_ref_ref):
     m_depth(kinect_object_ref_ref.get_depth()),
     m_video(kinect_object_ref_ref.get_video()),
-    m_resolution(kinect_object_ref_ref.get_resolution()),
     m_flags(kinect_object_ref_ref.get_flags()),
     m_log(kinect_object_ref_ref.get_log()),
     m_timestamp(kinect_object_ref_ref.get_timestamp())
@@ -54,8 +50,7 @@ KinectObject & KinectObject::operator = (KinectObject &&kinect_object_ref_ref)
 {
     m_depth = kinect_object_ref_ref.get_depth();
     m_video = kinect_object_ref_ref.get_video();
-    m_resolution = kinect_object_ref_ref.get_resolution();
-    m_flags = kinect_object_ref_ref.get_flags(),
+    m_flags = kinect_object_ref_ref.get_flags();
     m_log = kinect_object_ref_ref.get_log();
     m_timestamp = kinect_object_ref_ref.get_timestamp();
 

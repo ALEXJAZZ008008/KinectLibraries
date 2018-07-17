@@ -7,7 +7,6 @@ Konnector::Konnector(QDialog *parent):
     m_kinect_interface_ptr(new KinectInterface()),
     m_update_ptr(new QTimer(this)),
     m_acquisition_start_time(),
-    m_output_path(""),
     m_write_offset(0),
     m_is_connected(false),
     m_is_acquiring(false)
@@ -26,7 +25,7 @@ Konnector::Konnector(Konnector &kinect_frontend_ref):
     m_kinect_interface_ptr(kinect_frontend_ref.get_kinect_interface_ptr()),
     m_update_ptr(kinect_frontend_ref.get_update_ptr()),
     m_acquisition_start_time(kinect_frontend_ref.get_acquisition_start_time()),
-    m_output_path(kinect_frontend_ref.get_output_path()),
+    m_write_offset(kinect_frontend_ref.get_write_offset()),
     m_is_connected(kinect_frontend_ref.get_is_connected()),
     m_is_acquiring(kinect_frontend_ref.get_is_acquiring())
 {
@@ -40,7 +39,7 @@ Konnector & Konnector::operator = (Konnector &kinect_frontend_ref)
     m_kinect_interface_ptr = kinect_frontend_ref.get_kinect_interface_ptr();
     m_update_ptr = kinect_frontend_ref.get_update_ptr();
     m_acquisition_start_time = kinect_frontend_ref.get_acquisition_start_time();
-    m_output_path = kinect_frontend_ref.get_output_path();
+    m_write_offset = kinect_frontend_ref.get_write_offset();
     m_is_connected = kinect_frontend_ref.get_is_connected();
     m_is_acquiring = kinect_frontend_ref.get_is_acquiring();
 
@@ -53,7 +52,7 @@ Konnector::Konnector(Konnector &&kinect_frontend_ref_ref):
     m_kinect_interface_ptr(kinect_frontend_ref_ref.get_kinect_interface_ptr()),
     m_update_ptr(kinect_frontend_ref_ref.get_update_ptr()),
     m_acquisition_start_time(kinect_frontend_ref_ref.get_acquisition_start_time()),
-    m_output_path(kinect_frontend_ref_ref.get_output_path()),
+    m_write_offset(kinect_frontend_ref_ref.get_write_offset()),
     m_is_connected(kinect_frontend_ref_ref.get_is_connected()),
     m_is_acquiring(kinect_frontend_ref_ref.get_is_acquiring())
 {
@@ -67,7 +66,7 @@ Konnector & Konnector::operator = (Konnector &&kinect_frontend_ref_ref)
     m_kinect_interface_ptr = kinect_frontend_ref_ref.get_kinect_interface_ptr();
     m_update_ptr = kinect_frontend_ref_ref.get_update_ptr();
     m_acquisition_start_time = kinect_frontend_ref_ref.get_acquisition_start_time();
-    m_output_path = kinect_frontend_ref_ref.get_output_path();
+    m_write_offset = kinect_frontend_ref_ref.get_write_offset();
     m_is_connected = kinect_frontend_ref_ref.get_is_connected();
     m_is_acquiring = kinect_frontend_ref_ref.get_is_acquiring();
 
@@ -82,22 +81,11 @@ int Konnector::konnector_main()
 
     connect(this, &Konnector::connection_status_changed, this, &Konnector::updateGUI_state);
 
-    //QSettings settings;
-
-    //! \todo Load the settings from a settings file : done. Then actually pass them
-    //! in the Backend in a meaningfull way.
-    // example:
-    //    if(settings.contains("output/set_depth_image"))
-    //      BackEnd::setOption ( settings.value("output/set_depth_image").toBool()  );
-    //    else
-    //      BackEnd::setOption ( default );
-    // More details can be found in konnector_settings.
+    update_settings();
 
     updateGUI_state();
 
     show();
-
-    m_logger_ptr->show();
 
     return 1;
 }
@@ -138,6 +126,89 @@ int Konnector::destructor(bool hard)
 
         m_kinect_interface_ptr = nullptr;
     }
+}
+
+int Konnector::update_settings()
+{
+    QSettings settings;
+
+    if(settings.contains("output/set_depth_image"))
+    {
+        m_kinect_interface_ptr->get_kinect_backend_ref().set_depth_image_bool(settings.value("output/set_depth_image").toBool());
+        m_kinect_interface_ptr->get_kinect_input_output_ptr()->set_depth_image_bool(settings.value("output/set_depth_image").toBool());
+    }
+    else
+    {
+        m_kinect_interface_ptr->get_kinect_backend_ref().set_depth_image_bool(false);
+        m_kinect_interface_ptr->get_kinect_input_output_ptr()->set_depth_image_bool(false);
+    }
+
+    if(settings.contains("output/set_rgb_image"))
+    {
+        m_kinect_interface_ptr->get_kinect_backend_ref().set_rgb_image_bool(settings.value("output/set_rgb_image").toBool());
+        m_kinect_interface_ptr->get_kinect_input_output_ptr()->set_rgb_image_bool(settings.value("output/set_rgb_image").toBool());
+    }
+    else
+    {
+        m_kinect_interface_ptr->get_kinect_backend_ref().set_rgb_image_bool(false);
+        m_kinect_interface_ptr->get_kinect_input_output_ptr()->set_rgb_image_bool(false);
+    }
+
+    if(settings.contains("output/set_pc_txt"))
+    {
+
+    }
+    else
+    {
+
+    }
+
+    if(settings.contains("output/set_pc_bin"))
+    {
+
+    }
+    else
+    {
+
+    }
+
+    if(settings.contains("input/resolution_small"))
+    {
+        m_kinect_interface_ptr->get_kinect_backend_ref().set_resolution_small_bool(settings.value("input/resolution_small").toBool());
+    }
+    else
+    {
+        m_kinect_interface_ptr->get_kinect_backend_ref().set_resolution_small_bool(false);
+    }
+
+    if(settings.contains("input/resolution_med"))
+    {
+        m_kinect_interface_ptr->get_kinect_backend_ref().set_resolution_med_bool(settings.value("input/resolution_med").toBool());
+    }
+    else
+    {
+        m_kinect_interface_ptr->get_kinect_backend_ref().set_resolution_med_bool(true);
+    }
+
+    if(settings.contains("input/resolution_high"))
+    {
+        m_kinect_interface_ptr->get_kinect_backend_ref().set_resolution_high_bool(settings.value("input/resolution_high").toBool());
+    }
+    else
+    {
+        m_kinect_interface_ptr->get_kinect_backend_ref().set_resolution_high_bool(true);
+    }
+
+    if(settings.contains("defaults/output_path"))
+    {
+        m_kinect_interface_ptr->get_kinect_input_output_ptr()->set_output_path(settings.value("defaults/output_path").toString().toStdString());
+    }
+    else
+    {
+        m_kinect_interface_ptr->get_kinect_input_output_ptr()->set_output_path(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString());
+    }
+
+    return 1;
 }
 
 int Konnector::update_output()
@@ -194,6 +265,8 @@ void Konnector::on__psh_connect_clicked()
         if(m_kinect_interface_ptr->get_kinect_backend_ref().kinect_backend_main() > 0)
         {
             m_is_connected = true;
+
+            m_logger_ptr->show();
 
             updateGUI_state();
 
@@ -265,7 +338,7 @@ void Konnector::on__psh_acquire_stop_clicked()
 
 void Konnector::on__psh_show_log_clicked()
 {
-    if (m_logger_ptr->isVisible())
+    if (!m_logger_ptr->isVisible())
     {
         m_logger_ptr->show();
     }
@@ -273,14 +346,18 @@ void Konnector::on__psh_show_log_clicked()
     {
         m_logger_ptr->hide();
     }
+
+    updateGUI_state();
 }
 
 void Konnector::on__psh_output_path_clicked()
 {
-    m_output_path =  QFileDialog::getExistingDirectory(this,
-                                                       tr("Select the output path."),
-                                                       m_output_path,
-                                                       QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    m_kinect_interface_ptr->get_kinect_input_output_ptr()->get_output_path() =  QFileDialog::getExistingDirectory(this,
+                                                                                                                  tr("Select the output path."),
+                                                                                                                  QString::fromStdString(m_kinect_interface_ptr->get_kinect_input_output_ptr()->get_output_path()),
+                                                                                                                  QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks).toStdString();
+
+    updateGUI_state();
 }
 
 void Konnector::on__psh_settings_clicked()
@@ -289,10 +366,14 @@ void Konnector::on__psh_settings_clicked()
 
     konnector_settings_ptr->exec();
 
+    update_settings();
+
     if(konnector_settings_ptr != nullptr)
     {
         delete konnector_settings_ptr;
 
         konnector_settings_ptr = nullptr;
     }
+
+    updateGUI_state();
 }

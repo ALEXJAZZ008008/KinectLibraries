@@ -26,14 +26,13 @@ class konnector;
 }
 
 //!
-//! \class
+//! \class The Konnector class.
 //! \brief The Konnector class.
 //! This is a Qt frontend for the KinectBackend class
 //! This class calls the KinectBackend class,
 //! collects its outputs and displays them to the user
 //! This class is capable of moving the Kinect's motor
 //!
-//! \todo Start / Stop writting frames on start acquisition
 //! \todo The output path should be taken from output_path QString
 //! \todo The outputs should be the selected by the options widget.
 //!
@@ -115,14 +114,14 @@ public:
         return 1;
     }
 
-    inline QString & get_output_path()
+    inline unsigned char get_write_offset()
     {
-        return m_output_path;
+        return m_write_offset;
     }
 
-    inline int set_output_path(QString &output_path)
+    inline int set_write_offset(unsigned char write_offset)
     {
-        m_output_path = output_path;
+        m_write_offset = write_offset;
 
         return 1;
     }
@@ -170,10 +169,7 @@ private:
 
     high_resolution_clock::time_point m_acquisition_start_time;
 
-    //! The path in which the output files will be written
-    QString m_output_path;
-
-    quint8 m_write_offset;
+    unsigned char m_write_offset;
 
     //! Tracks if a camera is connected
     bool m_is_connected;
@@ -185,9 +181,9 @@ private:
     //! and any other methods aiming to destruct the class
     int destructor(bool);
 
+    int update_settings();
+
     //! Updates the text in the UI
-    //! \todo Write the number of frames on ui->lbl_frames_recd
-    //! \todo Write the number of time lapsed on ui->lbl_time_lapsed
     int update_output();
 
 signals:

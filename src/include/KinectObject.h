@@ -51,18 +51,6 @@ public:
         return 1;
     }
 
-    inline vector<unsigned short> & get_resolution()
-    {
-        return m_resolution;
-    }
-
-    inline int set_resolution(vector<unsigned short> &resolution)
-    {
-        m_resolution = resolution;
-
-        return 1;
-    }
-
     inline vector<bool> & get_flags()
     {
         return m_flags;
@@ -108,8 +96,6 @@ private:
     vector<unsigned short> m_depth;
 
     vector<unsigned char> m_video;
-
-    vector<unsigned short> m_resolution;
 
     vector<bool> m_flags;
 

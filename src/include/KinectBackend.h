@@ -80,6 +80,18 @@ public:
         return 1;
     }
 
+    inline vector<unsigned short> & get_resolution()
+    {
+        return m_resolution;
+    }
+
+    inline int set_resolution(vector<unsigned short> &resolution)
+    {
+        m_resolution = resolution;
+
+        return 1;
+    }
+
     inline int get_reset_camera_tilt()
     {
         return m_reset_camera_tilt;
@@ -125,6 +137,66 @@ public:
         return 1;
     }
 
+    inline bool get_depth_image_bool()
+    {
+        return m_depth_image_bool;
+    }
+
+    inline int set_depth_image_bool(bool depth_image_bool)
+    {
+        m_depth_image_bool = depth_image_bool;
+
+        return 1;
+    }
+
+    inline bool get_rgb_image_bool()
+    {
+        return m_rgb_image_bool;
+    }
+
+    inline int set_rgb_image_bool(bool rgb_image_bool)
+    {
+        m_rgb_image_bool = rgb_image_bool;
+
+        return 1;
+    }
+
+    inline bool get_resolution_small_bool()
+    {
+        return m_resolution_small_bool;
+    }
+
+    inline int set_resolution_small_bool(bool resolution_small_bool)
+    {
+        m_resolution_small_bool = resolution_small_bool;
+
+        return 1;
+    }
+
+    inline bool get_resolution_med_bool()
+    {
+        return m_resolution_med_bool;
+    }
+
+    inline int set_resolution_med_bool(bool resolution_med_bool)
+    {
+        m_resolution_med_bool = resolution_med_bool;
+
+        return 1;
+    }
+
+    inline bool get_resolution_high_bool()
+    {
+        return m_resolution_high_bool;
+    }
+
+    inline int set_resolution_high_bool(bool resolution_high_bool)
+    {
+        m_resolution_high_bool = resolution_high_bool;
+
+        return 1;
+    }
+
     //! Create connections
     int kinect_backend_main();
 
@@ -156,6 +228,8 @@ private:
     //! Current tilt state.
     freenect_raw_tilt_state *m_current_tilt_state_ptr;
 
+    vector<unsigned short> m_resolution;
+
     float m_reset_camera_tilt;
 
     //! Camera tilt
@@ -166,6 +240,16 @@ private:
 
     //! Number of devices connected to the PC.
     int m_number_of_devices;
+
+    bool m_depth_image_bool;
+
+    bool m_rgb_image_bool;
+
+    bool m_resolution_small_bool;
+
+    bool m_resolution_med_bool;
+
+    bool m_resolution_high_bool;
 
     //! Called by destructor
     //! and any other methods aimign to destruct the class
