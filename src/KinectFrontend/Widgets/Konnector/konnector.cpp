@@ -7,6 +7,8 @@ Konnector::Konnector(QDialog *parent):
     m_kinect_interface_ptr(new KinectInterface()),
     m_update_ptr(new QTimer(this)),
     m_acquisition_start_time(),
+    m_acquisition_frequency(30.0f),
+    m_acquisition_speed(1000.0f / m_acquisition_frequency),
     m_write_offset(0),
     m_is_connected(false),
     m_is_acquiring(false)
@@ -25,6 +27,8 @@ Konnector::Konnector(Konnector &kinect_frontend_ref):
     m_kinect_interface_ptr(kinect_frontend_ref.get_kinect_interface_ptr()),
     m_update_ptr(kinect_frontend_ref.get_update_ptr()),
     m_acquisition_start_time(kinect_frontend_ref.get_acquisition_start_time()),
+    m_acquisition_frequency(kinect_frontend_ref.get_acquisition_frequency()),
+    m_acquisition_speed(kinect_frontend_ref.get_acquisition_speed()),
     m_write_offset(kinect_frontend_ref.get_write_offset()),
     m_is_connected(kinect_frontend_ref.get_is_connected()),
     m_is_acquiring(kinect_frontend_ref.get_is_acquiring())
@@ -39,6 +43,8 @@ Konnector & Konnector::operator = (Konnector &kinect_frontend_ref)
     m_kinect_interface_ptr = kinect_frontend_ref.get_kinect_interface_ptr();
     m_update_ptr = kinect_frontend_ref.get_update_ptr();
     m_acquisition_start_time = kinect_frontend_ref.get_acquisition_start_time();
+    m_acquisition_frequency = kinect_frontend_ref.get_acquisition_frequency();
+    m_acquisition_speed = kinect_frontend_ref.get_acquisition_speed();
     m_write_offset = kinect_frontend_ref.get_write_offset();
     m_is_connected = kinect_frontend_ref.get_is_connected();
     m_is_acquiring = kinect_frontend_ref.get_is_acquiring();
@@ -52,6 +58,8 @@ Konnector::Konnector(Konnector &&kinect_frontend_ref_ref):
     m_kinect_interface_ptr(kinect_frontend_ref_ref.get_kinect_interface_ptr()),
     m_update_ptr(kinect_frontend_ref_ref.get_update_ptr()),
     m_acquisition_start_time(kinect_frontend_ref_ref.get_acquisition_start_time()),
+    m_acquisition_frequency(kinect_frontend_ref_ref.get_acquisition_frequency()),
+    m_acquisition_speed(kinect_frontend_ref_ref.get_acquisition_speed()),
     m_write_offset(kinect_frontend_ref_ref.get_write_offset()),
     m_is_connected(kinect_frontend_ref_ref.get_is_connected()),
     m_is_acquiring(kinect_frontend_ref_ref.get_is_acquiring())
@@ -66,6 +74,8 @@ Konnector & Konnector::operator = (Konnector &&kinect_frontend_ref_ref)
     m_kinect_interface_ptr = kinect_frontend_ref_ref.get_kinect_interface_ptr();
     m_update_ptr = kinect_frontend_ref_ref.get_update_ptr();
     m_acquisition_start_time = kinect_frontend_ref_ref.get_acquisition_start_time();
+    m_acquisition_frequency = kinect_frontend_ref_ref.get_acquisition_frequency();
+    m_acquisition_speed = kinect_frontend_ref_ref.get_acquisition_speed();
     m_write_offset = kinect_frontend_ref_ref.get_write_offset();
     m_is_connected = kinect_frontend_ref_ref.get_is_connected();
     m_is_acquiring = kinect_frontend_ref_ref.get_is_acquiring();
@@ -244,7 +254,7 @@ void Konnector::update()
             update_output();
         }
 
-        if(m_write_offset >= 30)
+        if(m_write_offset >= m_acquisition_frequency)
         {
             m_ui_ptr->lbl_frames_recd->setText(to_string(m_kinect_interface_ptr->get_kinect_input_output_ptr()->get_frames_recorded()).c_str());
             m_ui_ptr->lbl_time_lapsed->setText(to_string(duration_cast<duration<int>>(high_resolution_clock::now() - m_acquisition_start_time).count()).c_str());
@@ -305,7 +315,7 @@ void Konnector::on__psh_acquire_start_clicked()
     if(m_is_connected)
     {
         connect(m_update_ptr, SIGNAL(timeout()), this, SLOT(update()));
-        m_update_ptr->start(33);
+        m_update_ptr->start(m_acquisition_frequency);
 
         m_kinect_interface_ptr->get_kinect_input_output_ptr()->set_frames_recorded(0);
         m_acquisition_start_time = high_resolution_clock::now();

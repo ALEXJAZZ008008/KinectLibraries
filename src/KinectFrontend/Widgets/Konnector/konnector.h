@@ -114,6 +114,30 @@ public:
         return 1;
     }
 
+    inline float get_acquisition_frequency()
+    {
+        return m_acquisition_frequency;
+    }
+
+    inline int set_acquitions_frequency(float acquisition_frequency)
+    {
+        m_acquisition_frequency = acquisition_frequency;
+
+        return 1;
+    }
+
+    inline float get_acquisition_speed()
+    {
+        return m_acquisition_speed;
+    }
+
+    inline int set_acquitions_speed(float acquisition_speed)
+    {
+        m_acquisition_speed = acquisition_speed;
+
+        return 1;
+    }
+
     inline unsigned char get_write_offset()
     {
         return m_write_offset;
@@ -168,6 +192,10 @@ private:
     QTimer *m_update_ptr;
 
     high_resolution_clock::time_point m_acquisition_start_time;
+
+    float m_acquisition_frequency;
+
+    float m_acquisition_speed;
 
     unsigned char m_write_offset;
 
