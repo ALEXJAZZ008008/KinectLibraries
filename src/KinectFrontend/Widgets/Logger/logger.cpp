@@ -10,7 +10,7 @@ Logger::Logger(QWidget *parent) :
 
 Logger::~Logger()
 {
-    delete m_ui_ptr;
+
 }
 
 Logger::Logger(Logger &logger_ref):
@@ -39,7 +39,29 @@ Logger & Logger::operator = (Logger &&logger_ref_ref)
     return *this;
 }
 
-void Logger::print(const QString& string)
+int Logger::logger_main()
+{
+    return 1;
+}
+
+int Logger::logger_kill(bool hard)
+{
+    destructor(hard);
+
+    return 1;
+}
+
+int Logger::print(const QString& string)
 {
     m_ui_ptr->_lbl_output_msg->insertPlainText(string);
+
+    return 1;
+}
+
+int Logger::destructor(bool hard)
+{
+    if(m_ui_ptr != nullptr)
+    {
+        m_ui_ptr = nullptr;
+    }
 }

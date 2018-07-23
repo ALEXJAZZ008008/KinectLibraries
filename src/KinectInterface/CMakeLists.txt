@@ -6,9 +6,6 @@ target_link_libraries(${PROJECT_NAME} KinectObject KinectBackend KinectInputOutp
 
 target_sources(KinectInterface 
 	PRIVATE
-	"${CMAKE_CURRENT_LIST_DIR}/KinectInterface.cpp"
-    # "${CMAKE_CURRENT_LIST_DIR}/KinectInterface.h"
-    ) 
+	"${CMAKE_CURRENT_LIST_DIR}/KinectInterface.cpp") 
 
 install(TARGETS KinectInterface DESTINATION lib)
-

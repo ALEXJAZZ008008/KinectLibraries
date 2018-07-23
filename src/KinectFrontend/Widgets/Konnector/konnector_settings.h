@@ -6,9 +6,14 @@
 #include <QStandardPaths>
 #include <QFileDialog>
 
+#include <memory>
+
 #include "ui_konnector_settings.h"
 
-namespace Ui {
+using namespace std;
+
+namespace Ui
+{
 class Konnector_Settings;
 }
 
@@ -25,22 +30,22 @@ public:
     Konnector_Settings(Konnector_Settings &&);
     Konnector_Settings & operator = (Konnector_Settings &&);
 
-    inline Ui::Konnector_Settings * get_ui_ptr()
+    inline shared_ptr<Ui::Konnector_Settings> & get_ui_ptr()
     {
         return m_ui_ptr;
     }
 
-    inline int set_ui_ptr(Ui::Konnector_Settings *ui_ptr)
+    inline int set_ui_ptr(shared_ptr<Ui::Konnector_Settings> &ui_ptr)
     {
         m_ui_ptr = ui_ptr;
     }
 
-    int konnector_main();
+    int konnector_settings_main();
 
-    int konnector_kill(bool);
+    int konnector_settings_kill(bool);
 
 private:
-    Ui::Konnector_Settings *m_ui_ptr;
+    shared_ptr<Ui::Konnector_Settings> m_ui_ptr;
 
     //! Called by destructor
     //! and any other methods aiming to destruct the class

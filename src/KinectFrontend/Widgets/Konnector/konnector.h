@@ -9,6 +9,7 @@
 #include <QSettings>
 #include <QTimer>
 
+#include <memory>
 #include <chrono>
 
 #include "ui_konnector.h"
@@ -26,7 +27,7 @@ class konnector;
 }
 
 //!
-//! \class The Konnector class.
+//! \class Konnector
 //! \brief The Konnector class.
 //! This is a Qt frontend for the KinectBackend class
 //! This class calls the KinectBackend class,
@@ -54,48 +55,48 @@ public:
     Konnector(Konnector &&);
     Konnector & operator = (Konnector &&);
 
-    inline Ui::konnector * get_ui_ptr()
+    inline shared_ptr<Ui::konnector> & get_ui_ptr()
     {
         return m_ui_ptr;
     }
 
-    inline int set_ui_ptr(Ui::konnector *ui_ptr)
+    inline int set_ui_ptr(shared_ptr<Ui::konnector> &ui_ptr)
     {
         m_ui_ptr = ui_ptr;
 
         return 1;
     }
 
-    inline Logger * get_logger_ptr()
+    inline shared_ptr<Logger> & get_logger_ptr()
     {
         return m_logger_ptr;
     }
 
-    inline int set_logger_ptr(Logger *logger_ptr)
+    inline int set_logger_ptr(shared_ptr<Logger> &logger_ptr)
     {
         m_logger_ptr = logger_ptr;
 
         return 1;
     }
 
-    inline KinectInterface * get_kinect_interface_ptr()
+    inline shared_ptr<KinectInterface> & get_kinect_interface_ptr()
     {
         return m_kinect_interface_ptr;
     }
 
-    inline int set_kinect_interface_ptr(KinectInterface *kinect_interface_ptr)
+    inline int set_kinect_interface_ptr(shared_ptr<KinectInterface> &kinect_interface_ptr)
     {
         m_kinect_interface_ptr = kinect_interface_ptr;
 
         return 1;
     }
 
-    inline QTimer * get_update_ptr()
+    inline shared_ptr<QTimer> & get_update_ptr()
     {
         return m_update_ptr;
     }
 
-    inline int set_update_ptr(QTimer *update_ptr)
+    inline int set_update_ptr(shared_ptr<QTimer> update_ptr)
     {
         m_update_ptr = update_ptr;
 
@@ -181,15 +182,15 @@ public:
 private:
 
     //! Pointer to the UI namespace
-    Ui::konnector *m_ui_ptr;
+    shared_ptr<Ui::konnector> m_ui_ptr;
 
     //! A window to display the log
-    Logger *m_logger_ptr;
+    shared_ptr<Logger> m_logger_ptr;
 
-    KinectInterface *m_kinect_interface_ptr;
+    shared_ptr<KinectInterface> m_kinect_interface_ptr;
 
     //! Pointer to the update timer
-    QTimer *m_update_ptr;
+    shared_ptr<QTimer> m_update_ptr;
 
     high_resolution_clock::time_point m_acquisition_start_time;
 

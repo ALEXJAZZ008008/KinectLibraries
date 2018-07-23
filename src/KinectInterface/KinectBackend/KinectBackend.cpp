@@ -35,7 +35,7 @@ int KinectBackend::set_stored_camera_tilt(float increment)
 {
     update_tilt_state();
 
-    freenect_tilt_status_code tilt_state = freenect_get_tilt_status(m_current_tilt_state_ptr);
+    freenect_tilt_status_code tilt_state = freenect_get_tilt_status(m_current_tilt_state_ptr.get());
 
     float current_camera_tilt = get_device_camera_tilt();
 
@@ -94,26 +94,31 @@ int KinectBackend::set_stored_camera_tilt(float increment)
 
 int KinectBackend::kinect_backend_main()
 {
-    if(freenect_init(&m_freenect_context_ptr, NULL) < 0)
+    freenect_context *freenect_context_ptr;
+
+    if(freenect_init(&freenect_context_ptr, NULL) < 0)
     {
         m_kinect_object_ptr->get_log() += "Initialisation error!!\n";
 
-        KinectBackend::getInstance().~KinectBackend();
+        KinectBackend::getInstance().kinect_backend_kill(true);
 
         return -1;
     }
 
-#ifdef QT_DEBUG
-    freenect_set_log_level(m_freenect_context_ptr, FREENECT_LOG_DEBUG);
-#else
-    freenect_set_log_level(m_freenect_context_ptr, FREENECT_LOG_FATAL);
-#endif
+    //m_freenect_context_ptr = make_shared<freenect_context>(freenect_context_ptr);
 
-    freenect_select_subdevices(m_freenect_context_ptr, static_cast<freenect_device_flags>(FREENECT_DEVICE_MOTOR | FREENECT_DEVICE_CAMERA));
+    if(freenect_context_ptr != nullptr)
+    {
+        freenect_context_ptr = nullptr;
+    }
 
-    m_number_of_devices = freenect_num_devices(m_freenect_context_ptr);
+    freenect_set_log_level(m_freenect_context_ptr.get(), FREENECT_LOG_FATAL);
 
-    if (m_number_of_devices == 0)
+    freenect_select_subdevices(m_freenect_context_ptr.get(), static_cast<freenect_device_flags>(FREENECT_DEVICE_MOTOR | FREENECT_DEVICE_CAMERA));
+
+    m_number_of_devices = freenect_num_devices(m_freenect_context_ptr.get());
+
+    if(m_number_of_devices == 0)
     {
         m_kinect_object_ptr->get_log() += "No devices found!!\n";
 
@@ -124,12 +129,21 @@ int KinectBackend::kinect_backend_main()
         m_kinect_object_ptr->get_log() += "Num devices found: " + to_string(m_number_of_devices) + "\n";
     }
 
+    freenect_device *freenect_device_ptr;
+
     //Open the device.
-    if (freenect_open_device(m_freenect_context_ptr, &m_freenect_device_ptr, 0) < 0)
+    if(freenect_open_device(m_freenect_context_ptr.get(), &freenect_device_ptr, 0) < 0)
     {
         m_kinect_object_ptr->get_log() += "Unable to connect with camera!!\n";
 
         return -1;
+    }
+
+    //m_freenect_device_ptr = make_shared<freenect_device>(freenect_device_ptr);
+
+    if(freenect_device_ptr != nullptr)
+    {
+        freenect_device_ptr = nullptr;
     }
 
     freenect_resolution resolution;
@@ -158,14 +172,14 @@ int KinectBackend::kinect_backend_main()
     }
 
     //Set depth and video modes
-    if(freenect_set_depth_mode(m_freenect_device_ptr, freenect_find_depth_mode(resolution, FREENECT_DEPTH_MM)))
+    if(freenect_set_depth_mode(m_freenect_device_ptr.get(), freenect_find_depth_mode(resolution, FREENECT_DEPTH_MM)))
     {
         m_kinect_object_ptr->get_log() += "Unable to set depth mode!!\n";
 
         return -1;
     }
 
-    if (freenect_set_video_mode(m_freenect_device_ptr, freenect_find_video_mode(resolution, FREENECT_VIDEO_RGB)))
+    if (freenect_set_video_mode(m_freenect_device_ptr.get(), freenect_find_video_mode(resolution, FREENECT_VIDEO_RGB)))
     {
         m_kinect_object_ptr->get_log() += "Unable to set video mode!!\n";
 
@@ -210,17 +224,17 @@ int KinectBackend::kinect_backend_main()
     m_kinect_object_ptr->get_video() = vector<unsigned char>(((m_resolution.at(0) * m_resolution.at(1)) * 3), 0);
 
     //Set frame callback
-    freenect_set_depth_callback(m_freenect_device_ptr, KinectBackend::depth_callback);
-    freenect_set_video_callback(m_freenect_device_ptr, KinectBackend::video_callback);
+    freenect_set_depth_callback(m_freenect_device_ptr.get(), KinectBackend::depth_callback);
+    freenect_set_video_callback(m_freenect_device_ptr.get(), KinectBackend::video_callback);
 
-    if(freenect_start_depth(m_freenect_device_ptr))
+    if(freenect_start_depth(m_freenect_device_ptr.get()))
     {
         m_kinect_object_ptr->get_log() += "Unable to start depth!!\n";
 
         return -1;
     }
 
-    if(freenect_start_video(m_freenect_device_ptr))
+    if(freenect_start_video(m_freenect_device_ptr.get()))
     {
         m_kinect_object_ptr->get_log() += "Unable to start video!!\n";
 
@@ -229,7 +243,7 @@ int KinectBackend::kinect_backend_main()
 
     set_device_camera_tilt(m_reset_camera_tilt);
 
-    freenect_set_led(m_freenect_device_ptr, LED_RED);
+    freenect_set_led(m_freenect_device_ptr.get(), LED_RED);
 
     m_kinect_object_ptr->get_log() += "Connection established!!\n";
 
@@ -245,7 +259,7 @@ int KinectBackend::kinect_backend_kill(bool hard)
 
 int KinectBackend::update()
 {
-    freenect_process_events(m_freenect_context_ptr);
+    freenect_process_events(m_freenect_context_ptr.get());
 
     return 1;
 }
@@ -262,26 +276,26 @@ int KinectBackend::destructor(bool hard)
 
     if(m_freenect_device_ptr != nullptr)
     {
-        freenect_stop_depth(m_freenect_device_ptr);
-        freenect_stop_video(m_freenect_device_ptr);
-        freenect_close_device(m_freenect_device_ptr);
+        freenect_stop_depth(m_freenect_device_ptr.get());
+        freenect_stop_video(m_freenect_device_ptr.get());
+        freenect_close_device(m_freenect_device_ptr.get());
 
         m_freenect_device_ptr = nullptr;
     }
 
     if(m_freenect_context_ptr != nullptr)
     {
-        freenect_shutdown(m_freenect_context_ptr);
+        freenect_shutdown(m_freenect_context_ptr.get());
 
         m_freenect_context_ptr = nullptr;
     }
 
     if(m_current_tilt_state_ptr != nullptr)
     {
-        delete m_current_tilt_state_ptr;
-
         m_current_tilt_state_ptr = nullptr;
     }
+
+    m_kinect_object_ptr->get_log() += "Connection Terminated!!\n";
 
     return 1;
 }
@@ -298,9 +312,9 @@ void KinectBackend::depth_callback(freenect_device *freenect_device_ptr, void *d
         }
 
         KinectBackend::getInstance().m_kinect_object_ptr->set_timestamp(timestamp);
-
-        KinectBackend::getInstance().m_kinect_object_ptr->get_log() += "-> depth: " + to_string(timestamp) + "\n";
     }
+
+    KinectBackend::getInstance().m_kinect_object_ptr->get_log() += "-> depth: " + to_string(timestamp) + "\n";
 
     KinectBackend::getInstance().m_kinect_object_ptr->get_flags().at(0) = true;
 }
@@ -317,37 +331,37 @@ void KinectBackend::video_callback(freenect_device *freenect_device_ptr, void *d
         }
 
         KinectBackend::getInstance().m_kinect_object_ptr->set_timestamp(timestamp);
-
-        KinectBackend::getInstance().m_kinect_object_ptr->get_log() += "-> video: "  + to_string(timestamp) + "\n";
     }
+
+    KinectBackend::getInstance().m_kinect_object_ptr->get_log() += "-> video: "  + to_string(timestamp) + "\n";
 
     KinectBackend::getInstance().m_kinect_object_ptr->get_flags().at(1) = true;
 }
 
 int KinectBackend::update_tilt_state()
 {
-    if (freenect_update_tilt_state(m_freenect_device_ptr) < 0)
+    if (freenect_update_tilt_state(m_freenect_device_ptr.get()) < 0)
     {
         m_kinect_object_ptr->get_log() += "Unable to retrieve tilt status!!\n";
 
         return -1;
     }
 
-    m_current_tilt_state_ptr = freenect_get_tilt_state(m_freenect_device_ptr);
+    //m_current_tilt_state_ptr = make_shared<freenect_raw_tilt_state>(freenect_get_tilt_state(m_freenect_device_ptr.get()));
 
     return 1;
 }
 
-float KinectBackend::get_device_camera_tilt()
+inline float KinectBackend::get_device_camera_tilt()
 {
-    return freenect_get_tilt_degs(m_current_tilt_state_ptr);
+    return freenect_get_tilt_degs(m_current_tilt_state_ptr.get());
 }
 
 int KinectBackend::set_device_camera_tilt(float new_camera_tilt)
 {
     if(new_camera_tilt < 25.0f && new_camera_tilt > -25.0f)
     {
-        freenect_set_tilt_degs(m_freenect_device_ptr, new_camera_tilt);
+        freenect_set_tilt_degs(m_freenect_device_ptr.get(), new_camera_tilt);
 
         m_stored_camera_tilt = new_camera_tilt;
 

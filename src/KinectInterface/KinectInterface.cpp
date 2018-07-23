@@ -6,7 +6,7 @@ KinectInterface::KinectInterface():
     m_kinect_object_ptr(new KinectObject())
 {
     m_kinect_backend_ref.set_kinect_object_ptr(m_kinect_object_ptr);
-    m_kinect_input_output_ptr->set_kinect_object(m_kinect_object_ptr);
+    m_kinect_input_output_ptr->set_kinect_object_ptr(m_kinect_object_ptr);
 }
 
 KinectInterface::~KinectInterface()
@@ -71,15 +71,11 @@ int KinectInterface::destructor(bool hard)
 {
     if(m_kinect_input_output_ptr != nullptr)
     {
-        delete m_kinect_input_output_ptr;
-
         m_kinect_input_output_ptr = nullptr;
     }
 
     if(m_kinect_object_ptr != nullptr)
     {
-        delete m_kinect_object_ptr;
-
         m_kinect_object_ptr = nullptr;
     }
 

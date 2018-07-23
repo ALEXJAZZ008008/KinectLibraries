@@ -111,30 +111,22 @@ int Konnector::destructor(bool hard)
 {
     if(m_ui_ptr != nullptr)
     {
-        delete m_ui_ptr;
-
         m_ui_ptr = nullptr;
     }
 
     if(m_logger_ptr != nullptr)
     {
-        delete m_logger_ptr;
-
         m_logger_ptr = nullptr;
-    }
-
-    if(m_update_ptr != nullptr)
-    {
-        delete m_update_ptr;
-
-        m_update_ptr = nullptr;
     }
 
     if(m_kinect_interface_ptr != nullptr)
     {
-        delete m_kinect_interface_ptr;
-
         m_kinect_interface_ptr = nullptr;
+    }
+
+    if(m_update_ptr != nullptr)
+    {
+        m_update_ptr = nullptr;
     }
 }
 
@@ -314,7 +306,7 @@ void Konnector::on__psh_acquire_start_clicked()
 {
     if(m_is_connected)
     {
-        connect(m_update_ptr, SIGNAL(timeout()), this, SLOT(update()));
+        connect(m_update_ptr.get(), SIGNAL(timeout()), this, SLOT(update()));
         m_update_ptr->start(m_acquisition_frequency);
 
         m_kinect_interface_ptr->get_kinect_input_output_ptr()->set_frames_recorded(0);

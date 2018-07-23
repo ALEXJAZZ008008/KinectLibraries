@@ -114,12 +114,12 @@ Konnector_Settings & Konnector_Settings::operator = (Konnector_Settings &&konect
     return *this;
 }
 
-int Konnector_Settings::konnector_main()
+int Konnector_Settings::konnector_settings_main()
 {
     return 1;
 }
 
-int Konnector_Settings::konnector_kill(bool hard)
+int Konnector_Settings::konnector_settings_kill(bool hard)
 {
     destructor(hard);
 
@@ -130,8 +130,6 @@ int Konnector_Settings::destructor(bool hard)
 {
     if(m_ui_ptr != nullptr)
     {
-        delete m_ui_ptr;
-
         m_ui_ptr = nullptr;
     }
 }
