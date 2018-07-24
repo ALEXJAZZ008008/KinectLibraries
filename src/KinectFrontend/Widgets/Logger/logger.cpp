@@ -62,6 +62,7 @@ int Logger::print(const QString& string)
 
 int Logger::destructor(bool hard)
 {
+    if (hard) {}
     if(m_ui_ptr != nullptr)
     {
         delete m_ui_ptr;

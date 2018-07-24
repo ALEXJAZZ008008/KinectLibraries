@@ -75,12 +75,12 @@ public:
         return 1;
     }
 
-    inline int get_current_camera_tilt()
+    inline double get_current_camera_tilt()
     {
         return m_current_camera_tilt;
     }
 
-    inline int set_current_camera_tilt(int current_camera_tilt)
+    inline int set_current_camera_tilt(double current_camera_tilt)
     {
         m_current_camera_tilt = current_camera_tilt;
 
@@ -113,7 +113,7 @@ private:
 
     string m_log;
 
-    int m_current_camera_tilt;
+    double m_current_camera_tilt;
 
     unsigned int m_timestamp;
 

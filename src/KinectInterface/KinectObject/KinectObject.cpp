@@ -76,5 +76,7 @@ int KinectObject::kinect_object_kill(bool hard)
 
 int KinectObject::destructor(bool hard)
 {
+    if(hard) {}
     return 1;
+
 }

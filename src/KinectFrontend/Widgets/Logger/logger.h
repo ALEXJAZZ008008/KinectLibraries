@@ -13,7 +13,7 @@ class Logger : public QWidget
     Q_OBJECT
 
 public:
-    explicit Logger(QWidget *parent = 0);
+    explicit Logger(QWidget *parent = nullptr);
     ~Logger();
 
     //! Copy and move constructos and assignment opperators,

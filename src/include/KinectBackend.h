@@ -105,7 +105,7 @@ public:
     }
 
     //! Gets reset camera tilt value
-    inline int get_reset_camera_tilt()
+    inline double get_reset_camera_tilt()
     {
         return m_reset_camera_tilt;
     }
@@ -128,16 +128,16 @@ public:
     int set_current_camera_tilt(int);
 
     //! Sets stored current camera tilt value
-    int set_current_camera_tilt(float);
+    int set_current_camera_tilt(double);
 
     //! Gets increment value
-    inline float get_increment()
+    inline double get_increment()
     {
         return m_increment;
     }
 
     //! Sets increment value
-    inline int set_increment(float increment)
+    inline int set_increment(double increment)
     {
         m_increment = increment;
 
@@ -264,10 +264,10 @@ private:
     vector<unsigned short> m_resolution;
 
     //! Holds value which camera should be reset to
-    float m_reset_camera_tilt;
+    double m_reset_camera_tilt;
 
     //! Holds step size of camera tilt.
-    float m_increment;
+    double m_increment;
 
     //! Holds number of devices connected to the PC.
     int m_number_of_devices;
@@ -301,10 +301,10 @@ private:
     int update_tilt_state();
 
     //! Gets device camera tilt
-    inline float get_device_camera_tilt();
+    inline double get_device_camera_tilt();
 
     //! Sets device camera tilt
-    int set_device_camera_tilt(float);
+    int set_device_camera_tilt(double);
 };
 
 #endif // KINECTBACKEND_H

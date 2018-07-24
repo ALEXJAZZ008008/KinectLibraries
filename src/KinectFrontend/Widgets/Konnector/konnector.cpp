@@ -111,6 +111,7 @@ int Konnector::konnector_kill(bool hard)
 
 int Konnector::destructor(bool hard)
 {
+    if(hard) {}
     if(m_ui_ptr != nullptr)
     {
         delete m_ui_ptr;
@@ -317,7 +318,7 @@ void Konnector::on_psh_tilt_up_clicked()
 {
     if(m_is_connected)
     {
-        KinectBackend::getInstance().set_current_camera_tilt(1.0f);
+        KinectBackend::getInstance().set_current_camera_tilt(1.0);
 
         emit camera_angle_changed();
     }
@@ -329,7 +330,7 @@ void Konnector::on_psh_tilt_down_clicked()
 {
     if(m_is_connected)
     {
-        KinectBackend::getInstance().set_current_camera_tilt(-1.0f);
+        KinectBackend::getInstance().set_current_camera_tilt(-1.0);
 
         emit camera_angle_changed();
     }

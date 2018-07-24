@@ -100,7 +100,7 @@ int KinectInputOutput::write_depth_to_file()
 {
     ofstream depth_stream(m_output_path + "/depth_" + to_string(m_kinect_object_ptr->get_timestamp()) + ".bin", ios::out | ios::binary);;
 
-    for(int i = 0; i < m_kinect_object_ptr->get_depth().size(); ++i)
+    for(unsigned long i = 0; i < m_kinect_object_ptr->get_depth().size(); ++i)
     {
         depth_stream.write(reinterpret_cast<char *>(&m_kinect_object_ptr->get_depth().at(i)), sizeof(unsigned short));
     }
@@ -117,7 +117,7 @@ int KinectInputOutput::write_video_to_file()
 {
     ofstream video_stream(m_output_path + "/video_" + to_string(m_kinect_object_ptr->get_timestamp()) + ".bin", ios::out | ios::binary);
 
-    for(int i = 0; i < m_kinect_object_ptr->get_video().size(); ++i)
+    for(unsigned long i = 0; i < m_kinect_object_ptr->get_video().size(); ++i)
     {
         video_stream.write(reinterpret_cast<char *>(&m_kinect_object_ptr->get_video().at(i)), sizeof(unsigned char));
     }
@@ -132,6 +132,7 @@ int KinectInputOutput::write_video_to_file()
 
 int KinectInputOutput::destructor(bool hard)
 {
+    if (hard) {}
     if(m_kinect_object_ptr != nullptr)
     {
         m_kinect_object_ptr = nullptr;

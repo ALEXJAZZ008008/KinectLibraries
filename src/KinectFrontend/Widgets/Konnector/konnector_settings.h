@@ -20,7 +20,7 @@ class Konnector_Settings : public QDialog
     Q_OBJECT
 
 public:
-    explicit Konnector_Settings(QWidget *parent = 0);
+    explicit Konnector_Settings(QWidget *parent = nullptr);
     ~Konnector_Settings();
 
     Konnector_Settings(Konnector_Settings &);

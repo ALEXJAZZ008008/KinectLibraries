@@ -44,7 +44,7 @@ class Konnector : public QDialog
 
 public:
     //! Constructor
-    explicit Konnector(QDialog *parent = 0);
+    explicit Konnector(QDialog *parent = nullptr);
 
     //! Destructor
     ~Konnector();
