@@ -118,18 +118,6 @@ public:
         return 1;
     }
 
-    //! Gets stored camera tilt value
-    inline int get_current_camera_tilt()
-    {
-        return m_kinect_object_ptr->get_current_camera_tilt();
-    }
-
-    //! Sets stored current camera tilt value
-    int set_current_camera_tilt(int);
-
-    //! Sets stored current camera tilt value
-    int set_current_camera_tilt(double);
-
     //! Gets increment value
     inline double get_increment()
     {
@@ -237,6 +225,12 @@ public:
     //! Updates the callback functions,
     //! must be called at regular intervals
     int update();
+
+    //! Sets stored current camera tilt value
+    int set_current_camera_tilt_with_angle(double);
+
+    //! Sets stored current camera tilt value
+    int set_current_camera_tilt_with_increment(double);
 
 private:
 

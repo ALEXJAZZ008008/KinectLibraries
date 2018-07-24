@@ -30,122 +30,6 @@ KinectBackend & KinectBackend::getInstance( )
     return instance;
 }
 
-int KinectBackend::set_current_camera_tilt(int increment)
-{
-    update_tilt_state();
-
-    freenect_tilt_status_code tilt_state = freenect_get_tilt_status(m_current_tilt_state_ptr);
-
-    switch(tilt_state)
-    {
-    case freenect_tilt_status_code::TILT_STATUS_MOVING:
-
-        m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
-
-        return -1;
-
-    case freenect_tilt_status_code::TILT_STATUS_LIMIT:
-
-        if(get_device_camera_tilt() > 0.0)
-        {
-            if(increment < 0)
-            {
-                set_device_camera_tilt(increment);
-            }
-            else
-            {
-                m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
-            }
-        }
-        else
-        {
-            if(increment > 0)
-            {
-                set_device_camera_tilt(increment);
-            }
-            else
-            {
-                m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
-            }
-        }
-
-        return -1;
-
-    case freenect_tilt_status_code::TILT_STATUS_STOPPED:
-
-        set_device_camera_tilt(increment);
-
-        return 1;
-
-    default:
-
-        m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
-
-        set_device_camera_tilt(0);
-
-        return -1;
-    }
-}
-
-int KinectBackend::set_current_camera_tilt(double increment)
-{
-    update_tilt_state();
-
-    freenect_tilt_status_code tilt_state = freenect_get_tilt_status(m_current_tilt_state_ptr);
-
-    double current_camera_tilt = get_device_camera_tilt();
-
-    switch(tilt_state)
-    {
-    case freenect_tilt_status_code::TILT_STATUS_MOVING:
-
-        m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
-
-        return -1;
-
-    case freenect_tilt_status_code::TILT_STATUS_LIMIT:
-
-        if(current_camera_tilt > 0.0)
-        {
-            if(increment < 0.0)
-            {
-                set_device_camera_tilt(static_cast<int>(current_camera_tilt + (m_increment * increment)));
-            }
-            else
-            {
-                m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
-            }
-        }
-        else
-        {
-            if(increment > 0.0)
-            {
-                set_device_camera_tilt(static_cast<int>(current_camera_tilt + (m_increment * increment)));
-            }
-            else
-            {
-                m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
-            }
-        }
-
-        return -1;
-
-    case freenect_tilt_status_code::TILT_STATUS_STOPPED:
-
-        set_device_camera_tilt(current_camera_tilt + (m_increment * increment));
-
-        return 1;
-
-    default:
-
-        m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
-
-        set_device_camera_tilt(0);
-
-        return -1;
-    }
-}
-
 int KinectBackend::kinect_backend_main()
 {
     if(freenect_init(&m_freenect_context_ptr, nullptr) < 0)
@@ -332,6 +216,122 @@ int KinectBackend::destructor(bool hard)
     }
 
     return 1;
+}
+
+int KinectBackend::set_current_camera_tilt_with_angle(double angle)
+{
+    update_tilt_state();
+
+    freenect_tilt_status_code tilt_state = freenect_get_tilt_status(m_current_tilt_state_ptr);
+
+    switch(tilt_state)
+    {
+    case freenect_tilt_status_code::TILT_STATUS_MOVING:
+
+        m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
+
+        return -1;
+
+    case freenect_tilt_status_code::TILT_STATUS_LIMIT:
+
+        if(get_device_camera_tilt() > 0.0)
+        {
+            if(angle < 0)
+            {
+                set_device_camera_tilt(angle);
+            }
+            else
+            {
+                m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
+            }
+        }
+        else
+        {
+            if(angle > 0)
+            {
+                set_device_camera_tilt(angle);
+            }
+            else
+            {
+                m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
+            }
+        }
+
+        return -1;
+
+    case freenect_tilt_status_code::TILT_STATUS_STOPPED:
+
+        set_device_camera_tilt(angle);
+
+        return 1;
+
+    default:
+
+        m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
+
+        set_device_camera_tilt(0.0);
+
+        return -1;
+    }
+}
+
+int KinectBackend::set_current_camera_tilt_with_increment(double increment)
+{
+    update_tilt_state();
+
+    freenect_tilt_status_code tilt_state = freenect_get_tilt_status(m_current_tilt_state_ptr);
+
+    double current_camera_tilt = get_device_camera_tilt();
+
+    switch(tilt_state)
+    {
+    case freenect_tilt_status_code::TILT_STATUS_MOVING:
+
+        m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
+
+        return -1;
+
+    case freenect_tilt_status_code::TILT_STATUS_LIMIT:
+
+        if(current_camera_tilt > 0.0)
+        {
+            if(increment < 0.0)
+            {
+                set_device_camera_tilt(static_cast<int>(current_camera_tilt + (m_increment * increment)));
+            }
+            else
+            {
+                m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
+            }
+        }
+        else
+        {
+            if(increment > 0.0)
+            {
+                set_device_camera_tilt(static_cast<int>(current_camera_tilt + (m_increment * increment)));
+            }
+            else
+            {
+                m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
+            }
+        }
+
+        return -1;
+
+    case freenect_tilt_status_code::TILT_STATUS_STOPPED:
+
+        set_device_camera_tilt(current_camera_tilt + (m_increment * increment));
+
+        return 1;
+
+    default:
+
+        m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
+
+        set_device_camera_tilt(0.0);
+
+        return -1;
+    }
 }
 
 void KinectBackend::depth_callback(freenect_device *freenect_device_ptr, void *data, unsigned int timestamp)

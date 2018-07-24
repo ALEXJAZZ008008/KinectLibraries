@@ -318,7 +318,7 @@ void Konnector::on_psh_tilt_up_clicked()
 {
     if(m_is_connected)
     {
-        KinectBackend::getInstance().set_current_camera_tilt(1.0);
+        KinectBackend::getInstance().set_current_camera_tilt_with_increment(1.0);
 
         emit camera_angle_changed();
     }
@@ -330,7 +330,7 @@ void Konnector::on_psh_tilt_down_clicked()
 {
     if(m_is_connected)
     {
-        KinectBackend::getInstance().set_current_camera_tilt(-1.0);
+        KinectBackend::getInstance().set_current_camera_tilt_with_increment(-1.0);
 
         emit camera_angle_changed();
     }
@@ -342,7 +342,7 @@ void Konnector::on_le_cur_tilt_returnPressed()
 {
     if(m_is_connected)
     {
-        KinectBackend::getInstance().set_current_camera_tilt(m_ui_ptr->le_cur_tilt->text().toInt());
+        KinectBackend::getInstance().set_current_camera_tilt_with_angle(m_ui_ptr->le_cur_tilt->text().toDouble());
 
         emit camera_angle_changed();
     }
