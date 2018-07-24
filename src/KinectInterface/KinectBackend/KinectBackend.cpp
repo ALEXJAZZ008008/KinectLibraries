@@ -88,8 +88,6 @@ int KinectBackend::set_stored_camera_tilt(float increment)
 
         return -1;
     }
-
-    return -1;
 }
 
 int KinectBackend::kinect_backend_main()
@@ -105,7 +103,8 @@ int KinectBackend::kinect_backend_main()
         return -1;
     }
 
-    //m_freenect_context_ptr = make_shared<freenect_context>(freenect_context_ptr);
+    //! \todo Make them raw pointers or encapsulate in a class
+    m_freenect_context_ptr.reset(freenect_context_ptr);
 
     if(freenect_context_ptr != nullptr)
     {
@@ -294,7 +293,7 @@ int KinectBackend::destructor(bool hard)
     {
         m_current_tilt_state_ptr = nullptr;
     }
-
+    //! \todo Crashes on termination.
     m_kinect_object_ptr->get_log() += "Connection Terminated!!\n";
 
     return 1;
@@ -347,7 +346,7 @@ int KinectBackend::update_tilt_state()
         return -1;
     }
 
-    //m_current_tilt_state_ptr = make_shared<freenect_raw_tilt_state>(freenect_get_tilt_state(m_freenect_device_ptr.get()));
+    m_current_tilt_state_ptr.reset(freenect_get_tilt_state(m_freenect_device_ptr.get()));
 
     return 1;
 }

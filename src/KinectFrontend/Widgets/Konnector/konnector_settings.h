@@ -38,6 +38,8 @@ public:
     inline int set_ui_ptr(shared_ptr<Ui::Konnector_Settings> &ui_ptr)
     {
         m_ui_ptr = ui_ptr;
+
+        return 1;
     }
 
     int konnector_settings_main();

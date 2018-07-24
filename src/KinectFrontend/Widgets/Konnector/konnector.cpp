@@ -2,7 +2,7 @@
 
 Konnector::Konnector(QDialog *parent):
     QDialog(parent),
-    m_ui_ptr(new Ui::konnector),
+    m_ui_ptr(new Ui::Konnector),
     m_logger_ptr(new Logger(this)),
     m_kinect_interface_ptr(new KinectInterface()),
     m_update_ptr(new QTimer(this)),
@@ -91,6 +91,12 @@ int Konnector::konnector_main()
 
     connect(this, &Konnector::connection_status_changed, this, &Konnector::updateGUI_state);
 
+    connect(m_ui_ptr->psh_tilt_up, &QPushButton::clicked,
+            this, &Konnector::on__psh_tilt_up);
+
+    connect(m_ui_ptr->psh_tilt_down, &QPushButton::clicked,
+            this, &Konnector::on__psh_tilt_down);
+
     update_settings();
 
     updateGUI_state();
@@ -128,6 +134,8 @@ int Konnector::destructor(bool hard)
     {
         m_update_ptr = nullptr;
     }
+
+    return 1;
 }
 
 int Konnector::update_settings()
@@ -233,6 +241,9 @@ void Konnector::updateGUI_state()
     m_ui_ptr->_psh_output_path->setEnabled(!m_is_acquiring);
     m_ui_ptr->_psh_settings->setEnabled(!m_is_acquiring);
 
+    m_ui_ptr->psh_tilt_up->setEnabled(m_is_connected);
+    m_ui_ptr->psh_tilt_down->setEnabled(m_is_connected);
+
 }
 
 void Konnector::update()
@@ -307,7 +318,7 @@ void Konnector::on__psh_acquire_start_clicked()
     if(m_is_connected)
     {
         connect(m_update_ptr.get(), SIGNAL(timeout()), this, SLOT(update()));
-        m_update_ptr->start(m_acquisition_frequency);
+        m_update_ptr->start(static_cast<int>(m_acquisition_frequency));
 
         m_kinect_interface_ptr->get_kinect_input_output_ptr()->set_frames_recorded(0);
         m_acquisition_start_time = high_resolution_clock::now();
@@ -378,4 +389,16 @@ void Konnector::on__psh_settings_clicked()
     }
 
     updateGUI_state();
+}
+
+void Konnector::on__psh_tilt_up()
+{
+    //! \todo Call backend to tilt up
+    //!
+}
+
+void Konnector::on__psh_tilt_down()
+{
+    //! \todo Call backend to tilt down
+    //!
 }

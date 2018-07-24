@@ -128,10 +128,13 @@ int Konnector_Settings::konnector_settings_kill(bool hard)
 
 int Konnector_Settings::destructor(bool hard)
 {
+    hard = false; // Added just to remove the warning.
     if(m_ui_ptr != nullptr)
     {
         m_ui_ptr = nullptr;
     }
+
+    return 1;
 }
 
 void Konnector_Settings::on_buttonBox_accepted()

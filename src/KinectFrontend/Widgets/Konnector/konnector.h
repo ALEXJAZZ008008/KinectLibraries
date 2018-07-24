@@ -23,7 +23,7 @@ using namespace std::chrono;
 //! Used by Qt GUI
 namespace Ui
 {
-class konnector;
+class Konnector;
 }
 
 //!
@@ -55,12 +55,12 @@ public:
     Konnector(Konnector &&);
     Konnector & operator = (Konnector &&);
 
-    inline shared_ptr<Ui::konnector> & get_ui_ptr()
+    inline shared_ptr<Ui::Konnector> & get_ui_ptr()
     {
         return m_ui_ptr;
     }
 
-    inline int set_ui_ptr(shared_ptr<Ui::konnector> &ui_ptr)
+    inline int set_ui_ptr(shared_ptr<Ui::Konnector> &ui_ptr)
     {
         m_ui_ptr = ui_ptr;
 
@@ -182,7 +182,7 @@ public:
 private:
 
     //! Pointer to the UI namespace
-    shared_ptr<Ui::konnector> m_ui_ptr;
+    shared_ptr<Ui::Konnector> m_ui_ptr;
 
     //! A window to display the log
     shared_ptr<Logger> m_logger_ptr;
@@ -252,6 +252,10 @@ private slots:
     void on__psh_output_path_clicked();
 
     void on__psh_settings_clicked();
+
+    void on__psh_tilt_up();
+
+    void on__psh_tilt_down();
 };
 
 #endif // KINECTFRONTEND_H

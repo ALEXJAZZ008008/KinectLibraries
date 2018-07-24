@@ -70,6 +70,8 @@ public:
     inline int set_frames_recorded(int frames_recorded)
     {
         m_frames_recorded = frames_recorded;
+
+        return 1;
     }
 
     //! Gets depth image bool
