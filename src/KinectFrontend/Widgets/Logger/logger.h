@@ -3,10 +3,6 @@
 
 #include <QWidget>
 
-#include <memory>
-
-using namespace std;
-
 namespace Ui
 {
 class Logger;
@@ -26,12 +22,12 @@ public:
     Logger(Logger &&);
     Logger & operator = (Logger &&);
 
-    inline shared_ptr<Ui::Logger> & get_ui_ptr()
+    inline Ui::Logger * get_ui_ptr()
     {
         return m_ui_ptr;
     }
 
-    inline int set_ui_ptr(shared_ptr<Ui::Logger> & ui_ptr)
+    inline int set_ui_ptr(Ui::Logger * ui_ptr)
     {
         m_ui_ptr = ui_ptr;
 
@@ -45,7 +41,7 @@ public:
     int print(const QString &_s);
 
 private:
-    shared_ptr<Ui::Logger> m_ui_ptr;
+    Ui::Logger *m_ui_ptr;
 
     //! Called by destructor
     //! and any other methods aiming to destruct the class

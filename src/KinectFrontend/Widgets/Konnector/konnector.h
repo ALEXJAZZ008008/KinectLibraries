@@ -55,26 +55,38 @@ public:
     Konnector(Konnector &&);
     Konnector & operator = (Konnector &&);
 
-    inline shared_ptr<Ui::Konnector> & get_ui_ptr()
+    inline Ui::Konnector * get_ui_ptr()
     {
         return m_ui_ptr;
     }
 
-    inline int set_ui_ptr(shared_ptr<Ui::Konnector> &ui_ptr)
+    inline int set_ui_ptr(Ui::Konnector *ui_ptr)
     {
         m_ui_ptr = ui_ptr;
 
         return 1;
     }
 
-    inline shared_ptr<Logger> & get_logger_ptr()
+    inline Logger * get_logger_ptr()
     {
         return m_logger_ptr;
     }
 
-    inline int set_logger_ptr(shared_ptr<Logger> &logger_ptr)
+    inline int set_logger_ptr(Logger *logger_ptr)
     {
         m_logger_ptr = logger_ptr;
+
+        return 1;
+    }
+
+    inline QTimer * get_update_ptr()
+    {
+        return m_update_ptr;
+    }
+
+    inline int set_update_ptr(QTimer *update_ptr)
+    {
+        m_update_ptr = update_ptr;
 
         return 1;
     }
@@ -87,18 +99,6 @@ public:
     inline int set_kinect_interface_ptr(shared_ptr<KinectInterface> &kinect_interface_ptr)
     {
         m_kinect_interface_ptr = kinect_interface_ptr;
-
-        return 1;
-    }
-
-    inline shared_ptr<QTimer> & get_update_ptr()
-    {
-        return m_update_ptr;
-    }
-
-    inline int set_update_ptr(shared_ptr<QTimer> update_ptr)
-    {
-        m_update_ptr = update_ptr;
 
         return 1;
     }
@@ -182,15 +182,15 @@ public:
 private:
 
     //! Pointer to the UI namespace
-    shared_ptr<Ui::Konnector> m_ui_ptr;
+    Ui::Konnector *m_ui_ptr;
 
     //! A window to display the log
-    shared_ptr<Logger> m_logger_ptr;
-
-    shared_ptr<KinectInterface> m_kinect_interface_ptr;
+    Logger *m_logger_ptr;
 
     //! Pointer to the update timer
-    shared_ptr<QTimer> m_update_ptr;
+    QTimer *m_update_ptr;
+
+    shared_ptr<KinectInterface> m_kinect_interface_ptr;
 
     high_resolution_clock::time_point m_acquisition_start_time;
 
@@ -219,6 +219,8 @@ signals:
     //! Emitted when connection status changes
     void connection_status_changed();
 
+    void camera_angle_changed();
+
     //! Emitted when acquisition has started
     void acquisition_status_changed();
 
@@ -240,6 +242,12 @@ private slots:
     //! Event handler for Disconnect button
     void on__psh_disconnect_clicked();
 
+    void on_psh_tilt_up_clicked();
+
+    void on_psh_tilt_down_clicked();
+
+    void on_le_cur_tilt_returnPressed();
+
     void on__psh_acquire_start_clicked();
 
     void on__psh_acquire_stop_clicked();
@@ -252,10 +260,6 @@ private slots:
     void on__psh_output_path_clicked();
 
     void on__psh_settings_clicked();
-
-    void on__psh_tilt_up();
-
-    void on__psh_tilt_down();
 };
 
 #endif // KINECTFRONTEND_H

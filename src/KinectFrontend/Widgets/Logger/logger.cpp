@@ -55,6 +55,8 @@ int Logger::print(const QString& string)
 {
     m_ui_ptr->_lbl_output_msg->insertPlainText(string);
 
+    m_ui_ptr->_lbl_output_msg->moveCursor(QTextCursor::End);
+
     return 1;
 }
 
@@ -62,6 +64,10 @@ int Logger::destructor(bool hard)
 {
     if(m_ui_ptr != nullptr)
     {
+        delete m_ui_ptr;
+
         m_ui_ptr = nullptr;
     }
+
+    return 1;
 }

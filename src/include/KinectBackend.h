@@ -49,13 +49,13 @@ public:
     }
 
     //! Gets freenect context pointer
-    inline shared_ptr<freenect_context> & get_freenect_context_ptr()
+    inline freenect_context * get_freenect_context_ptr()
     {
         return m_freenect_context_ptr;
     }
 
     //! Sets freenect context pointer
-    inline int set_freenect_context_ptr(shared_ptr<freenect_context> &freenect_context_ptr)
+    inline int set_freenect_context_ptr(freenect_context *freenect_context_ptr)
     {
         m_freenect_context_ptr = freenect_context_ptr;
 
@@ -63,13 +63,13 @@ public:
     }
 
     //! Gets freenect device pointer
-    inline shared_ptr<freenect_device> & get_freenect_device_ptr()
+    inline freenect_device * get_freenect_device_ptr()
     {
         return m_freenect_device_ptr;
     }
 
     //! Sets freenect device pointer
-    inline int set_freenect_device_ptr(shared_ptr<freenect_device> &freenect_device_ptr)
+    inline int set_freenect_device_ptr(freenect_device *freenect_device_ptr)
     {
         m_freenect_device_ptr = freenect_device_ptr;
 
@@ -77,13 +77,13 @@ public:
     }
 
     //! Gets current tilt state pointer
-    inline shared_ptr<freenect_raw_tilt_state> & get_current_tilt_state_ptr()
+    inline freenect_raw_tilt_state * get_current_tilt_state_ptr()
     {
         return m_current_tilt_state_ptr;
     }
 
     //! Sets current tilt state pointer
-    inline int set_current_tilt_state_ptr(shared_ptr<freenect_raw_tilt_state> &current_tilt_state_ptr)
+    inline int set_current_tilt_state_ptr(freenect_raw_tilt_state *current_tilt_state_ptr)
     {
         m_current_tilt_state_ptr = current_tilt_state_ptr;
 
@@ -119,13 +119,16 @@ public:
     }
 
     //! Gets stored camera tilt value
-    inline float get_stored_camera_tilt()
+    inline int get_current_camera_tilt()
     {
-        return m_stored_camera_tilt;
+        return m_kinect_object_ptr->get_current_camera_tilt();
     }
 
     //! Sets stored current camera tilt value
-    int set_stored_camera_tilt(float);
+    int set_current_camera_tilt(int);
+
+    //! Sets stored current camera tilt value
+    int set_current_camera_tilt(float);
 
     //! Gets increment value
     inline float get_increment()
@@ -249,22 +252,19 @@ private:
     shared_ptr<KinectObject> m_kinect_object_ptr;
 
     //! Holds information about the usb context.
-    shared_ptr<freenect_context> m_freenect_context_ptr;
+    freenect_context *m_freenect_context_ptr;
 
     //! Holds device information.
-    shared_ptr<freenect_device> m_freenect_device_ptr;
+    freenect_device *m_freenect_device_ptr;
 
     //! Hold current tilt state.
-    shared_ptr<freenect_raw_tilt_state> m_current_tilt_state_ptr;
+    freenect_raw_tilt_state *m_current_tilt_state_ptr;
 
     //! Holds the resolution that the kinect is set to
     vector<unsigned short> m_resolution;
 
     //! Holds value which camera should be reset to
     float m_reset_camera_tilt;
-
-    //! Holds camera tilt
-    float m_stored_camera_tilt;
 
     //! Holds step size of camera tilt.
     float m_increment;

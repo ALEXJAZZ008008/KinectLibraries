@@ -26,7 +26,7 @@
    <property name="bottomMargin">
     <number>2</number>
    </property>
-   <item row="2" column="0">
+   <item row="0" column="0" rowspan="2">
     <layout class="QGridLayout" name="gridLayout">
      <item row="5" column="0">
       <widget class="QPushButton" name="_psh_output_path">

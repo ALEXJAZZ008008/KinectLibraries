@@ -75,6 +75,18 @@ public:
         return 1;
     }
 
+    inline int get_current_camera_tilt()
+    {
+        return m_current_camera_tilt;
+    }
+
+    inline int set_current_camera_tilt(int current_camera_tilt)
+    {
+        m_current_camera_tilt = current_camera_tilt;
+
+        return 1;
+    }
+
     inline unsigned int get_timestamp()
     {
         return m_timestamp;
@@ -100,6 +112,8 @@ private:
     vector<bool> m_flags;
 
     string m_log;
+
+    int m_current_camera_tilt;
 
     unsigned int m_timestamp;
 
