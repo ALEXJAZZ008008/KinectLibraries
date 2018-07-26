@@ -69,7 +69,11 @@ int KinectInterface::update()
 
 int KinectInterface::destructor(bool hard)
 {
-    if (hard){}
+    if(hard)
+    {
+
+    }
+
     if(m_kinect_input_output_ptr != nullptr)
     {
         m_kinect_input_output_ptr = nullptr;

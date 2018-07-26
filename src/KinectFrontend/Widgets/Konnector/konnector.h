@@ -39,7 +39,6 @@ class Konnector;
 //!
 class Konnector : public QDialog
 {
-
     Q_OBJECT
 
 public:

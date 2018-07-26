@@ -110,29 +110,29 @@ int KinectBackend::kinect_backend_main()
     {
     case FREENECT_RESOLUTION_LOW:
 
-        m_resolution.at(0) = 320;
-        m_resolution.at(1) = 240;
+        m_resolution[0] = 320;
+        m_resolution[1] = 240;
 
         break;
 
     case FREENECT_RESOLUTION_MEDIUM:
 
-        m_resolution.at(0) = 640;
-        m_resolution.at(1) = 480;
+        m_resolution[0] = 640;
+        m_resolution[1] = 480;
 
         break;
 
     case FREENECT_RESOLUTION_HIGH:
 
-        m_resolution.at(0) = 1280;
-        m_resolution.at(1) = 1024;
+        m_resolution[0] = 1280;
+        m_resolution[1] = 1024;
 
         break;
 
     default:
 
-        m_resolution.at(0) = 0;
-        m_resolution.at(1) = 0;
+        m_resolution[0] = 0;
+        m_resolution[1] = 0;
 
         break;
     }
@@ -140,8 +140,8 @@ int KinectBackend::kinect_backend_main()
     m_kinect_object_ptr->get_depth() = vector<unsigned short>(0, 0);
     m_kinect_object_ptr->get_video() = vector<unsigned char>(0, 0);
 
-    m_kinect_object_ptr->get_depth() = vector<unsigned short>((m_resolution.at(0) * m_resolution.at(1)), 0);
-    m_kinect_object_ptr->get_video() = vector<unsigned char>(((m_resolution.at(0) * m_resolution.at(1)) * 3), 0);
+    m_kinect_object_ptr->get_depth() = vector<unsigned short>((m_resolution[0] * m_resolution[1]), 0);
+    m_kinect_object_ptr->get_video() = vector<unsigned char>(((m_resolution[0] * m_resolution[1]) * 3), 0);
 
     //Set frame callback
     freenect_set_depth_callback(m_freenect_device_ptr, KinectBackend::depth_callback);
@@ -264,15 +264,13 @@ int KinectBackend::set_current_camera_tilt_with_angle(double angle)
         set_device_camera_tilt(angle);
 
         return 1;
-
-    default:
-
-        m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
-
-        set_device_camera_tilt(0.0);
-
-        return -1;
     }
+
+    m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
+
+    set_device_camera_tilt(0.0);
+
+    return -1;
 }
 
 int KinectBackend::set_current_camera_tilt_with_increment(double increment)
@@ -323,26 +321,29 @@ int KinectBackend::set_current_camera_tilt_with_increment(double increment)
         set_device_camera_tilt(current_camera_tilt + (m_increment * increment));
 
         return 1;
-
-    default:
-
-        m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
-
-        set_device_camera_tilt(0.0);
-
-        return -1;
     }
+
+    m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
+
+    set_device_camera_tilt(0.0);
+
+    return -1;
 }
 
 void KinectBackend::depth_callback(freenect_device *freenect_device_ptr, void *data, unsigned int timestamp)
 {
+    if(freenect_device_ptr)
+    {
+
+    }
+
     if(KinectBackend::getInstance().get_depth_image_bool())
     {
         unsigned short *depth_ptr = static_cast<unsigned short *>(data);
 
         for(unsigned long i = 0; i < KinectBackend::getInstance().m_kinect_object_ptr->get_depth().size(); ++i)
         {
-            KinectBackend::getInstance().m_kinect_object_ptr->get_depth().at(i) = depth_ptr[i];
+            KinectBackend::getInstance().m_kinect_object_ptr->get_depth()[i] = depth_ptr[i];
         }
 
         KinectBackend::getInstance().m_kinect_object_ptr->set_timestamp(timestamp);
@@ -350,18 +351,23 @@ void KinectBackend::depth_callback(freenect_device *freenect_device_ptr, void *d
 
     KinectBackend::getInstance().m_kinect_object_ptr->get_log() += "-> depth: " + to_string(timestamp) + "\n";
 
-    KinectBackend::getInstance().m_kinect_object_ptr->get_flags().at(0) = true;
+    KinectBackend::getInstance().m_kinect_object_ptr->get_flags()[0] = true;
 }
 
 void KinectBackend::video_callback(freenect_device *freenect_device_ptr, void *data_ptr, unsigned int timestamp)
 {
+    if(freenect_device_ptr)
+    {
+
+    }
+
     if(KinectBackend::getInstance().get_rgb_image_bool())
     {
         unsigned char *video_ptr = static_cast<unsigned char *>(data_ptr);
 
         for(unsigned long i = 0; i < KinectBackend::getInstance().m_kinect_object_ptr->get_video().size(); ++i)
         {
-            KinectBackend::getInstance().m_kinect_object_ptr->get_video().at(i) = video_ptr[i];
+            KinectBackend::getInstance().m_kinect_object_ptr->get_video()[i] = video_ptr[i];
         }
 
         KinectBackend::getInstance().m_kinect_object_ptr->set_timestamp(timestamp);
@@ -369,7 +375,7 @@ void KinectBackend::video_callback(freenect_device *freenect_device_ptr, void *d
 
     KinectBackend::getInstance().m_kinect_object_ptr->get_log() += "-> video: "  + to_string(timestamp) + "\n";
 
-    KinectBackend::getInstance().m_kinect_object_ptr->get_flags().at(1) = true;
+    KinectBackend::getInstance().m_kinect_object_ptr->get_flags()[1] = true;
 }
 
 int KinectBackend::update_tilt_state()

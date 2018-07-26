@@ -111,7 +111,11 @@ int Konnector::konnector_kill(bool hard)
 
 int Konnector::destructor(bool hard)
 {
-    if(hard) {}
+    if(hard)
+    {
+
+    }
+
     if(m_ui_ptr != nullptr)
     {
         delete m_ui_ptr;

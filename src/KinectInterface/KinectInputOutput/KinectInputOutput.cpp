@@ -59,29 +59,29 @@ KinectInputOutput & KinectInputOutput::operator = (KinectInputOutput &&kinect_in
 
 int KinectInputOutput::kinect_input_output_main()
 {
-    if(m_kinect_object_ptr->get_flags().at(0) || m_kinect_object_ptr->get_flags().at(1))
+    if(m_kinect_object_ptr->get_flags()[0] || m_kinect_object_ptr->get_flags()[1])
     {
         if(m_depth_image_bool)
         {
-            if(m_kinect_object_ptr->get_flags().at(0))
+            if(m_kinect_object_ptr->get_flags()[0])
             {
                 write_depth_to_file();
 
                 ++m_frames_recorded;
 
-                m_kinect_object_ptr->get_flags().at(0) = false;
+                m_kinect_object_ptr->get_flags()[0] = false;
             }
         }
 
-        if(m_rgb_image_bool && m_kinect_object_ptr->get_flags().at(1))
+        if(m_rgb_image_bool && m_kinect_object_ptr->get_flags()[1])
         {
-            if(m_kinect_object_ptr->get_flags().at(1))
+            if(m_kinect_object_ptr->get_flags()[1])
             {
                 write_video_to_file();
 
                 ++m_frames_recorded;
 
-                m_kinect_object_ptr->get_flags().at(1) = false;
+                m_kinect_object_ptr->get_flags()[1] = false;
             }
         }
     }
@@ -102,7 +102,7 @@ int KinectInputOutput::write_depth_to_file()
 
     for(unsigned long i = 0; i < m_kinect_object_ptr->get_depth().size(); ++i)
     {
-        depth_stream.write(reinterpret_cast<char *>(&m_kinect_object_ptr->get_depth().at(i)), sizeof(unsigned short));
+        depth_stream.write(reinterpret_cast<char *>(&m_kinect_object_ptr->get_depth()[i]), sizeof(unsigned short));
     }
 
     depth_stream.flush();
@@ -119,7 +119,7 @@ int KinectInputOutput::write_video_to_file()
 
     for(unsigned long i = 0; i < m_kinect_object_ptr->get_video().size(); ++i)
     {
-        video_stream.write(reinterpret_cast<char *>(&m_kinect_object_ptr->get_video().at(i)), sizeof(unsigned char));
+        video_stream.write(reinterpret_cast<char *>(&m_kinect_object_ptr->get_video()[i]), sizeof(unsigned char));
     }
 
     video_stream.flush();
@@ -132,7 +132,11 @@ int KinectInputOutput::write_video_to_file()
 
 int KinectInputOutput::destructor(bool hard)
 {
-    if (hard) {}
+    if(hard)
+    {
+
+    }
+
     if(m_kinect_object_ptr != nullptr)
     {
         m_kinect_object_ptr = nullptr;
