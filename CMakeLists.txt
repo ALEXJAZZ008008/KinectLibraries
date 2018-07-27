@@ -32,7 +32,7 @@ if(CMAKE_COMPILER_IS_GNUCC)
     add_definitions(-Wall -Wno-deprecated)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -std=gnu++0x -ffast-math")
 
-endif ()
+endif()
 
 if((${CMAKE_CXX_COMPILER_ID} MATCHES "AppleClang") OR (APPLE AND ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" AND ${CMAKE_CXX_COMPILER_ID} MATCHES "Clang"))
 
@@ -43,7 +43,7 @@ endif()
 # We need the LibFreenect libraries, either locally installed
 # or we will download them from git.
 
-if (NOT LOCAL_LIBFREENECT)
+if(NOT LOCAL_LIBFREENECT)
     if(NOT DOWNLOAD_LibFreenect AND NOT DOWNLOAD_LibFreenect2)
 
         message(STATUS "${PROJECT_NAME} depends on libfreenect. You must either have it installed locally or download them.")
@@ -56,7 +56,7 @@ else()
 
 endif()
 
-if (NOT LOCAL_LIBFREENECT_2)
+if(NOT LOCAL_LIBFREENECT_2)
     if(NOT DOWNLOAD_LibFreenect AND NOT DOWNLOAD_LibFreenect2)
 
         message(STATUS "${PROJECT_NAME} depends on libfreenect 2. You must either have it installed locally or download them.")

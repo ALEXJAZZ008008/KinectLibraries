@@ -21,64 +21,64 @@ Konnector::~Konnector()
     destructor(true);
 }
 
-Konnector::Konnector(Konnector &kinect_frontend_ref):
-    m_ui_ptr(kinect_frontend_ref.get_ui_ptr()),
-    m_logger_ptr(kinect_frontend_ref.get_logger_ptr()),
-    m_update_ptr(kinect_frontend_ref.get_update_ptr()),
-    m_kinect_interface_ptr(kinect_frontend_ref.get_kinect_interface_ptr()),
-    m_acquisition_start_time(kinect_frontend_ref.get_acquisition_start_time()),
-    m_acquisition_frequency(kinect_frontend_ref.get_acquisition_frequency()),
-    m_acquisition_speed(kinect_frontend_ref.get_acquisition_speed()),
-    m_write_offset(kinect_frontend_ref.get_write_offset()),
-    m_is_connected(kinect_frontend_ref.get_is_connected()),
-    m_is_acquiring(kinect_frontend_ref.get_is_acquiring())
+Konnector::Konnector(Konnector &konnector_ref):
+    m_ui_ptr(konnector_ref.get_ui_ptr()),
+    m_logger_ptr(konnector_ref.get_logger_ptr()),
+    m_update_ptr(konnector_ref.get_update_ptr()),
+    m_kinect_interface_ptr(konnector_ref.get_kinect_interface_ptr()),
+    m_acquisition_start_time(konnector_ref.get_acquisition_start_time()),
+    m_acquisition_frequency(konnector_ref.get_acquisition_frequency()),
+    m_acquisition_speed(konnector_ref.get_acquisition_speed()),
+    m_write_offset(konnector_ref.get_write_offset()),
+    m_is_connected(konnector_ref.get_is_connected()),
+    m_is_acquiring(konnector_ref.get_is_acquiring())
 {
 
 }
 
-Konnector & Konnector::operator = (Konnector &kinect_frontend_ref)
+Konnector & Konnector::operator = (Konnector &konnector_ref)
 {
-    m_ui_ptr = kinect_frontend_ref.get_ui_ptr();
-    m_logger_ptr = kinect_frontend_ref.get_logger_ptr();
-    m_update_ptr = kinect_frontend_ref.get_update_ptr();
-    m_kinect_interface_ptr = kinect_frontend_ref.get_kinect_interface_ptr();
-    m_acquisition_start_time = kinect_frontend_ref.get_acquisition_start_time();
-    m_acquisition_frequency = kinect_frontend_ref.get_acquisition_frequency();
-    m_acquisition_speed = kinect_frontend_ref.get_acquisition_speed();
-    m_write_offset = kinect_frontend_ref.get_write_offset();
-    m_is_connected = kinect_frontend_ref.get_is_connected();
-    m_is_acquiring = kinect_frontend_ref.get_is_acquiring();
+    m_ui_ptr = konnector_ref.get_ui_ptr();
+    m_logger_ptr = konnector_ref.get_logger_ptr();
+    m_update_ptr = konnector_ref.get_update_ptr();
+    m_kinect_interface_ptr = konnector_ref.get_kinect_interface_ptr();
+    m_acquisition_start_time = konnector_ref.get_acquisition_start_time();
+    m_acquisition_frequency = konnector_ref.get_acquisition_frequency();
+    m_acquisition_speed = konnector_ref.get_acquisition_speed();
+    m_write_offset = konnector_ref.get_write_offset();
+    m_is_connected = konnector_ref.get_is_connected();
+    m_is_acquiring = konnector_ref.get_is_acquiring();
 
     return *this;
 }
 
-Konnector::Konnector(Konnector &&kinect_frontend_ref_ref):
-    m_ui_ptr(kinect_frontend_ref_ref.get_ui_ptr()),
-    m_logger_ptr(kinect_frontend_ref_ref.get_logger_ptr()),
-    m_update_ptr(kinect_frontend_ref_ref.get_update_ptr()),
-    m_kinect_interface_ptr(kinect_frontend_ref_ref.get_kinect_interface_ptr()),
-    m_acquisition_start_time(kinect_frontend_ref_ref.get_acquisition_start_time()),
-    m_acquisition_frequency(kinect_frontend_ref_ref.get_acquisition_frequency()),
-    m_acquisition_speed(kinect_frontend_ref_ref.get_acquisition_speed()),
-    m_write_offset(kinect_frontend_ref_ref.get_write_offset()),
-    m_is_connected(kinect_frontend_ref_ref.get_is_connected()),
-    m_is_acquiring(kinect_frontend_ref_ref.get_is_acquiring())
+Konnector::Konnector(Konnector &&konnector_ref_ref):
+    m_ui_ptr(konnector_ref_ref.get_ui_ptr()),
+    m_logger_ptr(konnector_ref_ref.get_logger_ptr()),
+    m_update_ptr(konnector_ref_ref.get_update_ptr()),
+    m_kinect_interface_ptr(konnector_ref_ref.get_kinect_interface_ptr()),
+    m_acquisition_start_time(konnector_ref_ref.get_acquisition_start_time()),
+    m_acquisition_frequency(konnector_ref_ref.get_acquisition_frequency()),
+    m_acquisition_speed(konnector_ref_ref.get_acquisition_speed()),
+    m_write_offset(konnector_ref_ref.get_write_offset()),
+    m_is_connected(konnector_ref_ref.get_is_connected()),
+    m_is_acquiring(konnector_ref_ref.get_is_acquiring())
 {
 
 }
 
-Konnector & Konnector::operator = (Konnector &&kinect_frontend_ref_ref)
+Konnector & Konnector::operator = (Konnector &&konnector_ref_ref)
 {
-    m_ui_ptr = kinect_frontend_ref_ref.get_ui_ptr();
-    m_logger_ptr = kinect_frontend_ref_ref.get_logger_ptr();
-    m_update_ptr = kinect_frontend_ref_ref.get_update_ptr();
-    m_kinect_interface_ptr = kinect_frontend_ref_ref.get_kinect_interface_ptr();
-    m_acquisition_start_time = kinect_frontend_ref_ref.get_acquisition_start_time();
-    m_acquisition_frequency = kinect_frontend_ref_ref.get_acquisition_frequency();
-    m_acquisition_speed = kinect_frontend_ref_ref.get_acquisition_speed();
-    m_write_offset = kinect_frontend_ref_ref.get_write_offset();
-    m_is_connected = kinect_frontend_ref_ref.get_is_connected();
-    m_is_acquiring = kinect_frontend_ref_ref.get_is_acquiring();
+    m_ui_ptr = konnector_ref_ref.get_ui_ptr();
+    m_logger_ptr = konnector_ref_ref.get_logger_ptr();
+    m_update_ptr = konnector_ref_ref.get_update_ptr();
+    m_kinect_interface_ptr = konnector_ref_ref.get_kinect_interface_ptr();
+    m_acquisition_start_time = konnector_ref_ref.get_acquisition_start_time();
+    m_acquisition_frequency = konnector_ref_ref.get_acquisition_frequency();
+    m_acquisition_speed = konnector_ref_ref.get_acquisition_speed();
+    m_write_offset = konnector_ref_ref.get_write_offset();
+    m_is_connected = konnector_ref_ref.get_is_connected();
+    m_is_acquiring = konnector_ref_ref.get_is_acquiring();
 
     return *this;
 }
