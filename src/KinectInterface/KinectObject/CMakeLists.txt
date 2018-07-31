@@ -5,9 +5,7 @@ add_library(KinectObject ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(KinectObject) 
 
 target_sources(KinectObject 
-	PRIVATE
-	"${CMAKE_CURRENT_LIST_DIR}/KinectObject.cpp"
-    # "${CMAKE_CURRENT_LIST_DIR}/KinectObject.h"
-    ) 
+    PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/KinectObject.cpp")
 
 install(TARGETS KinectObject DESTINATION lib)

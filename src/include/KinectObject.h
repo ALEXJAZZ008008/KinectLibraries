@@ -1,12 +1,13 @@
 #ifndef KINECTOBJECT_H
 #define KINECTOBJECT_H
 
-#include <array>
+#include <vector>
+#include <string>
 
 using namespace std;
 
 //!
-//! \class
+//! \class KinectObject
 //! \brief
 //! \details
 //!
@@ -22,23 +23,68 @@ public:
 
     //! Copy and move constructos and assignment opperators
     KinectObject(KinectObject &);
-    void operator = (KinectObject &);
+    KinectObject & operator = (KinectObject &);
     KinectObject(KinectObject &&);
-    void operator = (KinectObject &&);
+    KinectObject & operator = (KinectObject &&);
 
-    inline array<array<unsigned short, 1024>, 1280> & get_depth()
+    inline vector<unsigned short> & get_depth()
     {
         return m_depth;
     }
 
-    inline array<array<array<unsigned char, 3>, 1024>, 1280> & get_video()
+    inline int set_depth(vector<unsigned short> &depth)
+    {
+        m_depth = depth;
+
+        return 1;
+    }
+
+    inline vector<unsigned char> & get_video()
     {
         return m_video;
     }
 
-    inline array<unsigned short, 2> & get_resolution()
+    inline int set_video(vector<unsigned char> &video)
     {
-        return m_resolution;
+        m_video = video;
+
+        return 1;
+    }
+
+    inline vector<bool> & get_flags()
+    {
+        return m_flags;
+    }
+
+    inline int set_flags(vector<bool> &flags)
+    {
+        m_flags = flags;
+
+        return 1;
+    }
+
+    inline string & get_log()
+    {
+        return m_log;
+    }
+
+    inline int set_log(string &log)
+    {
+        m_log = log;
+
+        return 1;
+    }
+
+    inline double get_current_camera_tilt()
+    {
+        return m_current_camera_tilt;
+    }
+
+    inline int set_current_camera_tilt(double current_camera_tilt)
+    {
+        m_current_camera_tilt = current_camera_tilt;
+
+        return 1;
     }
 
     inline unsigned int get_timestamp()
@@ -53,47 +99,23 @@ public:
         return 1;
     }
 
-    inline bool get_got_depth()
-    {
-        return m_got_depth;
-    }
-
-    inline int set_got_depth(bool got_depth)
-    {
-        m_got_depth = got_depth;
-
-        return 1;
-    }
-
-    inline bool get_got_video()
-    {
-        return m_got_video;
-    }
-
-    inline int set_got_video(bool got_video)
-    {
-        m_got_video = got_video;
-
-        return 1;
-    }
-
     int kinect_object_main();
 
     int kinect_object_kill(bool);
 
 private:
 
-    array<array<unsigned short, 1024>, 1280> m_depth;
+    vector<unsigned short> m_depth;
 
-    array<array<array<unsigned char, 3>, 1024>, 1280> m_video;
+    vector<unsigned char> m_video;
 
-    array<unsigned short, 2> m_resolution;
+    vector<bool> m_flags;
+
+    string m_log;
+
+    double m_current_camera_tilt;
 
     unsigned int m_timestamp;
-
-    bool m_got_depth;
-
-    bool m_got_video;
 
     int destructor(bool);
 

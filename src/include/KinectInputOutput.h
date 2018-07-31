@@ -1,87 +1,138 @@
 #ifndef KINECTINPUTOUTPUT_H
 #define KINECTINPUTOUTPUT_H
 
+#include <memory>
 #include <fstream>
+#include <string>
 
 #include "KinectObject.h"
 
+using namespace std;
+
 //!
-//! \class
-//! \brief
-//! \details
+//! \class KinectInputOutput
+//! \brief The Kinect Input Output class.
+//! Outputs the current data in the Kinect Object class,
+//! outputs every time that the kinect backend gets a new frame.
+//! What should be output can be selected from the frontend.
 //!
 class KinectInputOutput
 {
 public:
 
     //! Constructor
-    explicit KinectInputOutput(KinectObject *);
+    explicit KinectInputOutput();
 
     //! Destructor
     ~KinectInputOutput();
 
     //! Copy and move constructos and assignment opperators
     KinectInputOutput(KinectInputOutput &);
-    void operator = (KinectInputOutput &);
+    KinectInputOutput & operator = (KinectInputOutput &);
     KinectInputOutput(KinectInputOutput &&);
-    void operator = (KinectInputOutput &&);
+    KinectInputOutput & operator = (KinectInputOutput &&);
 
-    //! Returns depth output
-    string get_depth_output();
-
-    //! Appends to depth output
-    inline int append_depth_output(string depth_output)
+    //! Gets kinect object ptr
+    inline shared_ptr<KinectObject> & get_kinect_object_ptr()
     {
-        m_depth_output += depth_output;
+        return m_kinect_object_ptr;
+    }
+
+    //! Sets kinect object ptr
+    inline int set_kinect_object_ptr(shared_ptr<KinectObject> &kinect_object_ptr)
+    {
+        m_kinect_object_ptr = kinect_object_ptr;
 
         return 1;
     }
 
-    //! Returns point cloud output
-    string get_point_cloud_output();
-
-    //! Appends to depth output
-    inline int append_point_cloud_output(string point_cloud_output)
+    //! Gets output path string
+    inline string & get_output_path()
     {
-        m_point_cloud_output += point_cloud_output;
+        return m_output_path;
+    }
+
+    //! Sets output path string
+    inline int set_output_path(string output_path)
+    {
+        m_output_path = output_path;
 
         return 1;
     }
 
-    //! Returns video output
-    string get_video_output();
-
-    //! Appends to depth output
-    inline int append_video_output(string video_output)
+    //! Gets frames recorded value
+    inline int get_frames_recorded()
     {
-        m_video_output += video_output;
+        return m_frames_recorded;
+    }
+
+    //! Sets frames recorded value
+    inline int set_frames_recorded(int frames_recorded)
+    {
+        m_frames_recorded = frames_recorded;
 
         return 1;
     }
 
+    //! Gets depth image bool
+    inline bool get_depth_image_bool()
+    {
+        return m_depth_image_bool;
+    }
+
+    //! Sets depth image bool
+    inline int set_depth_image_bool(bool depth_image_bool)
+    {
+        m_depth_image_bool = depth_image_bool;
+
+        return 1;
+    }
+
+    //! Gets rgb image bool
+    inline bool get_rgb_image_bool()
+    {
+        return m_rgb_image_bool;
+    }
+
+    //! Sets rgb image bool
+    inline int set_rgb_image_bool(bool rgb_image_bool)
+    {
+        m_rgb_image_bool = rgb_image_bool;
+
+        return 1;
+    }
+
+    //! Main, currently unused
     int kinect_input_output_main();
 
+    //! Disconnect or destruct remotely
     int kinect_input_output_kill(bool);
 
 private:
 
-    KinectObject *m_kinect_object_ptr;
+    //! Holds the values gathered from the kinect
+    shared_ptr<KinectObject> m_kinect_object_ptr;
 
-    //! Depth output
-    string m_depth_output;
+    //! Holds path to where output should be located
+    string m_output_path;
 
-    //! Depth output
-    string m_point_cloud_output;
+    //! Holds the total number of frames recorded
+    int m_frames_recorded;
 
-    //! Video output
-    string m_video_output;
+    //! True if the depth buffer should be written to file
+    bool m_depth_image_bool;
 
-    int output_depth();
+    //! True if the rgb buffer should be written to file
+    bool m_rgb_image_bool;
 
-    int output_point_cloud();
+    //! Writes contents of depth buffer to file
+    int write_depth_to_file();
 
-    int output_video();
+    //! Writes contents of video buffer to file
+    int write_video_to_file();
 
+    //! Called by destructor,
+    //! other methods may call to destruct the class
     int destructor(bool);
 
 };
