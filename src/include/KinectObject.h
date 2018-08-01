@@ -1,10 +1,12 @@
 #ifndef KINECTOBJECT_H
 #define KINECTOBJECT_H
 
+#include<chrono>
 #include <vector>
 #include <string>
 
 using namespace std;
+using namespace std::chrono;
 
 //!
 //! \class KinectObject
@@ -63,6 +65,18 @@ public:
         return 1;
     }
 
+    inline vector<unsigned short> & get_resolution()
+    {
+        return m_resolution;
+    }
+
+    inline int set_resolution(vector<unsigned short> &resolution)
+    {
+        m_resolution = resolution;
+
+        return 1;
+    }
+
     inline string & get_log()
     {
         return m_log;
@@ -87,14 +101,26 @@ public:
         return 1;
     }
 
-    inline unsigned int get_timestamp()
+    inline time_point<system_clock> get_epoch_timestamp()
     {
-        return m_timestamp;
+        return m_epoch_timestamp;
     }
 
-    inline int set_timestamp(unsigned int timestamp)
+    inline int set_epoch_timestamp(time_point<system_clock> epoch_timestamp)
     {
-        m_timestamp = timestamp;
+        m_epoch_timestamp = epoch_timestamp;
+
+        return 1;
+    }
+
+    inline unsigned int get_kinect_timestamp()
+    {
+        return m_kinect_timestamp;
+    }
+
+    inline int set_kinect_timestamp(unsigned int kinect_timestamp)
+    {
+        m_kinect_timestamp = kinect_timestamp;
 
         return 1;
     }
@@ -111,11 +137,16 @@ private:
 
     vector<bool> m_flags;
 
+    //! Holds the resolution that the kinect is set to
+    vector<unsigned short> m_resolution;
+
     string m_log;
 
     double m_current_camera_tilt;
 
-    unsigned int m_timestamp;
+    time_point<system_clock> m_epoch_timestamp;
+
+    unsigned int m_kinect_timestamp;
 
     int destructor(bool);
 

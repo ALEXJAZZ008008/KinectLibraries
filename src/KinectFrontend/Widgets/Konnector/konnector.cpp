@@ -130,16 +130,16 @@ int Konnector::destructor(bool hard)
         m_logger_ptr = nullptr;
     }
 
-    if(m_kinect_interface_ptr != nullptr)
-    {
-        m_kinect_interface_ptr = nullptr;
-    }
-
     if(m_update_ptr != nullptr)
     {
         delete m_update_ptr;
 
         m_update_ptr = nullptr;
+    }
+
+    if(m_kinect_interface_ptr != nullptr)
+    {
+        m_kinect_interface_ptr = nullptr;
     }
 
     return 1;
@@ -148,6 +148,15 @@ int Konnector::destructor(bool hard)
 int Konnector::update_settings()
 {
     QSettings settings;
+
+    if(settings.contains("defaults/output_path"))
+    {
+        m_kinect_interface_ptr->get_kinect_input_output_ptr()->set_output_path(settings.value("defaults/output_path").toString().toStdString());
+    }
+    else
+    {
+        m_kinect_interface_ptr->get_kinect_input_output_ptr()->set_output_path(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString());
+    }
 
     if(settings.contains("output/set_depth_image"))
     {
@@ -169,24 +178,6 @@ int Konnector::update_settings()
     {
         m_kinect_interface_ptr->get_kinect_backend_ref().set_rgb_image_bool(false);
         m_kinect_interface_ptr->get_kinect_input_output_ptr()->set_rgb_image_bool(false);
-    }
-
-    if(settings.contains("output/set_pc_txt"))
-    {
-
-    }
-    else
-    {
-
-    }
-
-    if(settings.contains("output/set_pc_bin"))
-    {
-
-    }
-    else
-    {
-
     }
 
     if(settings.contains("input/resolution_small"))
@@ -214,15 +205,6 @@ int Konnector::update_settings()
     else
     {
         m_kinect_interface_ptr->get_kinect_backend_ref().set_resolution_high_bool(true);
-    }
-
-    if(settings.contains("defaults/output_path"))
-    {
-        m_kinect_interface_ptr->get_kinect_input_output_ptr()->set_output_path(settings.value("defaults/output_path").toString().toStdString());
-    }
-    else
-    {
-        m_kinect_interface_ptr->get_kinect_input_output_ptr()->set_output_path(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString());
     }
 
     return 1;
@@ -261,13 +243,13 @@ void Konnector::update()
     {
         m_kinect_interface_ptr->update();
 
-        if(m_logger_ptr->isVisible())
-        {
-            update_output();
-        }
-
         if(m_write_offset >= m_acquisition_frequency)
         {
+            if(m_logger_ptr->isVisible())
+            {
+                update_output();
+            }
+
             m_ui_ptr->lbl_frames_recd->setText(to_string(m_kinect_interface_ptr->get_kinect_input_output_ptr()->get_frames_recorded()).c_str());
             m_ui_ptr->lbl_time_lapsed->setText(to_string(duration_cast<duration<int>>(high_resolution_clock::now() - m_acquisition_start_time).count()).c_str());
 
@@ -386,6 +368,17 @@ void Konnector::on__psh_acquire_stop_clicked()
     update_output();
 }
 
+void Konnector::on__psh_output_path_clicked()
+{
+    m_kinect_interface_ptr->get_kinect_input_output_ptr()->get_output_path() =
+            QFileDialog::getExistingDirectory(this,
+                                              tr("Select the output path."),
+                                              QString::fromStdString(m_kinect_interface_ptr->get_kinect_input_output_ptr()->get_output_path()),
+                                              QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks).toStdString();
+
+    updateGUI_state();
+}
+
 void Konnector::on__psh_show_log_clicked()
 {
     if (!m_logger_ptr->isVisible())
@@ -396,17 +389,6 @@ void Konnector::on__psh_show_log_clicked()
     {
         m_logger_ptr->hide();
     }
-
-    updateGUI_state();
-}
-
-void Konnector::on__psh_output_path_clicked()
-{
-    m_kinect_interface_ptr->get_kinect_input_output_ptr()->get_output_path() =
-            QFileDialog::getExistingDirectory(this,
-                                              tr("Select the output path."),
-                                              QString::fromStdString(m_kinect_interface_ptr->get_kinect_input_output_ptr()->get_output_path()),
-                                              QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks).toStdString();
 
     updateGUI_state();
 }

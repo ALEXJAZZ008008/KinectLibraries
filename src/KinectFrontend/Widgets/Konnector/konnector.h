@@ -225,15 +225,15 @@ signals:
 
 private slots:
 
-    //! Called by timer on timeout
-    void update();
-
     //! Updates the state of the GUI
     //! Three states considered:
     //! - Disconnected
     //! - Connected - idle
     //! - Acquiring
     void updateGUI_state();
+
+    //! Called by timer on timeout
+    void update();
 
     //! Event handler for Connect button
     void on__psh_connect_clicked();

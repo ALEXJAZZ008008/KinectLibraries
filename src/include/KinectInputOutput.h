@@ -102,7 +102,7 @@ public:
         return 1;
     }
 
-    //! Main, currently unused
+    //! Main
     int kinect_input_output_main();
 
     //! Disconnect or destruct remotely
@@ -125,11 +125,13 @@ private:
     //! True if the rgb buffer should be written to file
     bool m_rgb_image_bool;
 
+    int write_header_to_file(string, string, string, string, string);
+
     //! Writes contents of depth buffer to file
-    int write_depth_to_file();
+    string write_depth_to_file();
 
     //! Writes contents of video buffer to file
-    int write_video_to_file();
+    string write_video_to_file();
 
     //! Called by destructor,
     //! other methods may call to destruct the class

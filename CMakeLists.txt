@@ -13,11 +13,9 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 option(DOWNLOAD_LibFreenect "Downlaod the Freenect libraries v.1" OFF)
 option(DOWNLOAD_LibFreenect2 "Downlaod the Freenect libraries v.2" OFF)
-option(DOWNLOAD_Cereal "Downlaod the Cereal library" OFF)
 
 option(LOCAL_LIBFREENECT "Use Local Freenect libraries" OFF)
 option(LOCAL_LIBFREENECT_2 "Use Local Freenect 2 libraries" OFF)
-option(LOCAL_CEREAL "Use Local Cereal library" OFF)
 
 option(BUILD_DOC "Build documentation" ON)
 
@@ -68,19 +66,6 @@ else()
 
     set(FREENECT_2_ROOT "" CACHE PATH "Root path of libfreenect 2.")
     find_package(libfreenect2)
-
-endif()
-
-if(NOT LOCAL_CEREAL)
-    if(NOT DOWNLOAD_Cereal)
-
-        message(STATUS "${PROJECT_NAME} depends on cereal. You must either have it installed locally or download it.")
-
-    endif()
-else()
-
-    set(Cereal_ROOT "" CACHE PATH "Root path of cereal.")
-    find_package(cereal)
 
 endif()
 
@@ -160,43 +145,6 @@ if(DOWNLOAD_LibFreenect2)
 
 endif()
 
-if(DOWNLOAD_Cereal)
-
-    set(LOCAL_CEREAL "OFF")
-
-    configure_file(${CMAKE_MODULE_PATH}/cereal.txt.in cereal-download/CMakeLists.txt)
-
-    execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" . WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/cereal-download" )
-    execute_process(COMMAND "${CMAKE_COMMAND}" --build . WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/cereal-download")
-
-    add_subdirectory("${CMAKE_BINARY_DIR}/cereal-src" "${CMAKE_BINARY_DIR}/cereal-build")
-
-    INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR}/cereal-src/include)
-
-    set(Cereal_LIB_DIR "${CMAKE_BINARY_DIR}/lib")
-
-    if(WIN32)
-
-        set(prefix "")
-        set(suffix ".lib")
-
-    elseif(APPLE)
-
-        set(prefix "lib")
-        set(suffix ".a")
-
-    else()
-
-        set(prefix "lib")
-        set(suffix ".a")
-
-    endif()
-
-    set(Cereal_LIBRARY "${Cereal_LIB_DIR}/${prefix}cereal${suffix}")
-    set(Cereal_FOUND ON)
-
-endif()
-
 if(APPLE AND EXISTS /usr/local/opt/qt5)
 
     # Homebrew installs Qt5 (up to at least 5.9.1) in
@@ -260,7 +208,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(src/include)
 
-if(Freenect_FOUND AND Freenect_2_FOUND AND Cereal_FOUND)
+if(Freenect_FOUND AND Freenect_2_FOUND)
 
     include(src/CMakeLists.txt)
 
