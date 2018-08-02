@@ -37,7 +37,7 @@ int KinectBackend::kinect_backend_main()
 
         KinectBackend::getInstance().kinect_backend_kill(true);
 
-        return -1;
+        return 0;
     }
 
     freenect_set_log_level(m_freenect_context_ptr, FREENECT_LOG_FATAL);
@@ -50,7 +50,7 @@ int KinectBackend::kinect_backend_main()
     {
         m_kinect_object_ptr->get_log() += "No devices found!!\n";
 
-        return -1;
+        return 0;
     }
     else
     {
@@ -62,7 +62,7 @@ int KinectBackend::kinect_backend_main()
     {
         m_kinect_object_ptr->get_log() += "Unable to connect with camera!!\n";
 
-        return -1;
+        return 0;
     }
 
     freenect_resolution resolution;
@@ -95,14 +95,14 @@ int KinectBackend::kinect_backend_main()
     {
         m_kinect_object_ptr->get_log() += "Unable to set depth mode!!\n";
 
-        return -1;
+        return 0;
     }
 
     if (freenect_set_video_mode(m_freenect_device_ptr, freenect_find_video_mode(resolution, FREENECT_VIDEO_RGB)))
     {
         m_kinect_object_ptr->get_log() += "Unable to set video mode!!\n";
 
-        return -1;
+        return 0;
     }
 
     switch(resolution)
@@ -150,14 +150,14 @@ int KinectBackend::kinect_backend_main()
     {
         m_kinect_object_ptr->get_log() += "Unable to start depth!!\n";
 
-        return -1;
+        return 0;
     }
 
     if(freenect_start_video(m_freenect_device_ptr))
     {
         m_kinect_object_ptr->get_log() += "Unable to start video!!\n";
 
-        return -1;
+        return 0;
     }
 
     set_device_camera_tilt(m_reset_camera_tilt);
@@ -229,7 +229,7 @@ int KinectBackend::set_current_camera_tilt_with_angle(double angle)
 
         m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
 
-        return -1;
+        return 0;
 
     case freenect_tilt_status_code::TILT_STATUS_LIMIT:
 
@@ -256,7 +256,7 @@ int KinectBackend::set_current_camera_tilt_with_angle(double angle)
             }
         }
 
-        return -1;
+        return 0;
 
     case freenect_tilt_status_code::TILT_STATUS_STOPPED:
 
@@ -269,7 +269,7 @@ int KinectBackend::set_current_camera_tilt_with_angle(double angle)
 
     set_device_camera_tilt(0.0);
 
-    return -1;
+    return 0;
 }
 
 int KinectBackend::set_current_camera_tilt_with_increment(double increment)
@@ -286,7 +286,7 @@ int KinectBackend::set_current_camera_tilt_with_increment(double increment)
 
         m_kinect_object_ptr->get_log() += "Unable to tilt the camera!!\n";
 
-        return -1;
+        return 0;
 
     case freenect_tilt_status_code::TILT_STATUS_LIMIT:
 
@@ -313,7 +313,7 @@ int KinectBackend::set_current_camera_tilt_with_increment(double increment)
             }
         }
 
-        return -1;
+        return 0;
 
     case freenect_tilt_status_code::TILT_STATUS_STOPPED:
 
@@ -326,7 +326,7 @@ int KinectBackend::set_current_camera_tilt_with_increment(double increment)
 
     set_device_camera_tilt(0.0);
 
-    return -1;
+    return 0;
 }
 
 void KinectBackend::depth_callback(freenect_device *freenect_device_ptr, void *data, unsigned int timestamp)
@@ -381,11 +381,11 @@ void KinectBackend::video_callback(freenect_device *freenect_device_ptr, void *d
 
 int KinectBackend::update_tilt_state()
 {
-    if (freenect_update_tilt_state(m_freenect_device_ptr) < 0)
+    if(freenect_update_tilt_state(m_freenect_device_ptr) < 0)
     {
         m_kinect_object_ptr->get_log() += "Unable to retrieve tilt status!!\n";
 
-        return -1;
+        return 0;
     }
 
     m_current_tilt_state_ptr = freenect_get_tilt_state(m_freenect_device_ptr);
