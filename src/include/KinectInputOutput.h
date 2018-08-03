@@ -125,6 +125,7 @@ private:
     //! True if the rgb buffer should be written to file
     bool m_rgb_image_bool;
 
+    //! Writes header file for depth and video files
     int write_header_to_file(string, string, string, string, string);
 
     //! Writes contents of depth buffer to file

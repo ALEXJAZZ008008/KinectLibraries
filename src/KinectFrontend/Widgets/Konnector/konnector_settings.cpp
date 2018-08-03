@@ -142,9 +142,9 @@ void Konnector_Settings::on_buttonBox_accepted()
 void Konnector_Settings::on_pushButton_clicked()
 {
     QString output_path = QFileDialog::getExistingDirectory (this,
-                                                              tr("Select the output path."),
-                                                              m_ui_ptr->_le_default_output->text(),
-                                                              QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+                                                             tr("Select the output path."),
+                                                             m_ui_ptr->_le_default_output->text(),
+                                                             QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
     m_ui_ptr->_le_default_output->setText(output_path);
 }

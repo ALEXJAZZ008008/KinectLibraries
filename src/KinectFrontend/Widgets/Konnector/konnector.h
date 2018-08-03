@@ -34,13 +34,8 @@ class Konnector;
 //! collects its outputs and displays them to the user
 //! This class is capable of moving the Kinect's motor
 //!
-//! \todo The output path should be taken from output_path QString
-//! \todo The outputs should be the selected by the options widget.
-//!
 class Konnector : public QDialog
 {
-    Q_OBJECT
-
 public:
     //! Constructor
     explicit Konnector(QDialog *parent = nullptr);
@@ -54,11 +49,13 @@ public:
     Konnector(Konnector &&);
     Konnector & operator = (Konnector &&);
 
+    //! Gets ui ptr
     inline Ui::Konnector * get_ui_ptr()
     {
         return m_ui_ptr;
     }
 
+    //! Sets ui ptr
     inline int set_ui_ptr(Ui::Konnector *ui_ptr)
     {
         m_ui_ptr = ui_ptr;
@@ -66,11 +63,13 @@ public:
         return 1;
     }
 
+    //! Gets logger ptr
     inline Logger * get_logger_ptr()
     {
         return m_logger_ptr;
     }
 
+    //! Sets logger ptr
     inline int set_logger_ptr(Logger *logger_ptr)
     {
         m_logger_ptr = logger_ptr;
@@ -78,11 +77,13 @@ public:
         return 1;
     }
 
+    //! Gets update ptr
     inline QTimer * get_update_ptr()
     {
         return m_update_ptr;
     }
 
+    //! Sets update ptr
     inline int set_update_ptr(QTimer *update_ptr)
     {
         m_update_ptr = update_ptr;
@@ -90,11 +91,13 @@ public:
         return 1;
     }
 
+    //! Gets kinect interface ptr
     inline shared_ptr<KinectInterface> & get_kinect_interface_ptr()
     {
         return m_kinect_interface_ptr;
     }
 
+    //! Sets kinect interface ptr
     inline int set_kinect_interface_ptr(shared_ptr<KinectInterface> &kinect_interface_ptr)
     {
         m_kinect_interface_ptr = kinect_interface_ptr;
@@ -102,11 +105,13 @@ public:
         return 1;
     }
 
+    //! Gets acquisition start time object
     inline high_resolution_clock::time_point & get_acquisition_start_time()
     {
         return m_acquisition_start_time;
     }
 
+    //! Sets acquisition start time object
     inline int set_acquitions_start_time(high_resolution_clock::time_point &acquisition_start_time)
     {
         m_acquisition_start_time = acquisition_start_time;
@@ -114,11 +119,13 @@ public:
         return 1;
     }
 
+    //! Gets acquisition frequency value
     inline float get_acquisition_frequency()
     {
         return m_acquisition_frequency;
     }
 
+    //! Sets acquisition frequency value
     inline int set_acquitions_frequency(float acquisition_frequency)
     {
         m_acquisition_frequency = acquisition_frequency;
@@ -126,11 +133,13 @@ public:
         return 1;
     }
 
+    //! Gets acquisition speed value
     inline float get_acquisition_speed()
     {
         return m_acquisition_speed;
     }
 
+    //! Sets acquisition speed value
     inline int set_acquitions_speed(float acquisition_speed)
     {
         m_acquisition_speed = acquisition_speed;
@@ -138,11 +147,13 @@ public:
         return 1;
     }
 
+    //! Gets write offset value
     inline unsigned char get_write_offset()
     {
         return m_write_offset;
     }
 
+    //! Sets write offset value
     inline int set_write_offset(unsigned char write_offset)
     {
         m_write_offset = write_offset;
@@ -150,11 +161,13 @@ public:
         return 1;
     }
 
+    //! Gets is connected bool
     inline bool get_is_connected()
     {
         return m_is_connected;
     }
 
+    //! Sets is connected bool
     inline int set_is_connected(bool is_connected)
     {
         m_is_connected = is_connected;
@@ -162,11 +175,13 @@ public:
         return 1;
     }
 
+    //! Gets is acquiring bool
     inline bool get_is_acquiring()
     {
         return m_is_acquiring;
     }
 
+    //! Sets is acquiring bool
     inline int set_is_acquiring(bool is_acquiring)
     {
         m_is_acquiring = is_acquiring;
@@ -174,11 +189,16 @@ public:
         return 1;
     }
 
+    //! Main
     int konnector_main();
 
+    //! Destruct remotely
     int konnector_kill(bool);
 
 private:
+
+    //! Macro to indicate this is a QT object
+    Q_OBJECT
 
     //! Pointer to the UI namespace
     Ui::Konnector *m_ui_ptr;
@@ -189,14 +209,19 @@ private:
     //! Pointer to the update timer
     QTimer *m_update_ptr;
 
+    //! Holds pointer to the kinect interface
     shared_ptr<KinectInterface> m_kinect_interface_ptr;
 
+    //! Holds the time point that the current acquisition started at
     high_resolution_clock::time_point m_acquisition_start_time;
 
+    //! Holds the how often the acquisition occurs in a second
     float m_acquisition_frequency;
 
+    //! Holds how many ms need to pass before a new acquisition happens
     float m_acquisition_speed;
 
+    //! Holds how often a write should happen
     unsigned char m_write_offset;
 
     //! Tracks if a camera is connected
@@ -209,6 +234,7 @@ private:
     //! and any other methods aiming to destruct the class
     int destructor(bool);
 
+    //! Updates the values which store default values
     int update_settings();
 
     //! Updates the text in the UI
@@ -218,6 +244,7 @@ signals:
     //! Emitted when connection status changes
     void connection_status_changed();
 
+    //! Emitted when cammera angle changes
     void camera_angle_changed();
 
     //! Emitted when acquisition has started
@@ -241,23 +268,28 @@ private slots:
     //! Event handler for Disconnect button
     void on__psh_disconnect_clicked();
 
+    //! Event handler for Disconnect button
     void on_psh_tilt_up_clicked();
 
+    //! Event handler for Tilt Down button
     void on_psh_tilt_down_clicked();
 
+    //! Event handler for Current Tilt box
     void on_le_cur_tilt_returnPressed();
 
+    //! Event handler for Acquire Start button
     void on__psh_acquire_start_clicked();
 
+    //! Event handler for Acquire Stop button
     void on__psh_acquire_stop_clicked();
 
-    //! Show the log window
+    //! Event handler for Show Log button
     void on__psh_show_log_clicked();
 
-    //! Select the path of the output
-    //! \todo let the backend know this path
+    //! Event handler for Output Path button
     void on__psh_output_path_clicked();
 
+    //! Event handler for Settings button
     void on__psh_settings_clicked();
 };
 

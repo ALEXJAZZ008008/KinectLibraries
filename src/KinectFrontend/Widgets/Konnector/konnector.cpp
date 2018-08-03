@@ -212,7 +212,7 @@ int Konnector::update_settings()
 
 int Konnector::update_output()
 {
-    m_logger_ptr->print(m_kinect_interface_ptr->get_kinect_object_ptr()->get_log().c_str());
+    m_logger_ptr->print(m_kinect_interface_ptr->get_kinect_object_ptr()->get_log());
 
     m_ui_ptr->le_cur_tilt->setText(to_string(m_kinect_interface_ptr->get_kinect_object_ptr()->get_current_camera_tilt()).c_str());
 
@@ -264,13 +264,13 @@ void Konnector::update()
 
 void Konnector::on__psh_connect_clicked()
 {
+    m_logger_ptr->show();
+
     if(!m_is_connected)
     {
         if(m_kinect_interface_ptr->get_kinect_backend_ref().kinect_backend_main() > 0)
         {
             m_is_connected = true;
-
-            m_logger_ptr->show();
 
             emit connection_status_changed();
         }
