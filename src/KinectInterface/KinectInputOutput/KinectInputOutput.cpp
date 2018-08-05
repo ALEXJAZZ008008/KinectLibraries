@@ -65,7 +65,7 @@ int KinectInputOutput::kinect_input_output_main()
         {
             if(m_kinect_object_ptr->get_flags()[0])
             {
-                write_depth_to_file();
+                write_header_to_file("depth", write_depth_to_file(), "u", "16", "1");
 
                 ++m_frames_recorded;
 
@@ -77,7 +77,7 @@ int KinectInputOutput::kinect_input_output_main()
         {
             if(m_kinect_object_ptr->get_flags()[1])
             {
-                write_video_to_file();
+                write_header_to_file("video", write_video_to_file(), "u", "24", "3");
 
                 ++m_frames_recorded;
 
@@ -96,9 +96,33 @@ int KinectInputOutput::kinect_input_output_kill(bool hard)
     return 1;
 }
 
-int KinectInputOutput::write_depth_to_file()
+int KinectInputOutput::write_header_to_file(string path_options, string object_path, string data_type, string data_size, string data_dimensions)
 {
-    ofstream depth_stream(m_output_path + "/depth_" + to_string(m_kinect_object_ptr->get_timestamp()) + ".bin", ios::out | ios::binary);;
+    ofstream header_stream(m_output_path + "/header_" + path_options + "_" + to_string(m_kinect_object_ptr->get_kinect_timestamp()) + ".kpclp", ios::out);
+
+    header_stream << "kpclp_header_version=0.1" << endl;
+    header_stream << "data_type=" << data_type << endl;
+    header_stream << "data_size=" << data_size << endl;
+    header_stream << "data_dimensions=" << data_dimensions << endl;
+    header_stream << "data_resolution=" << to_string(m_kinect_object_ptr->get_resolution()[0]) << "," << to_string(m_kinect_object_ptr->get_resolution()[1]) << endl;
+    header_stream << "data_path=" << object_path << endl;
+    header_stream << "epoch_timestamp=" << to_string(m_kinect_object_ptr->get_epoch_timestamp().time_since_epoch().count()) << endl;
+    header_stream << "kinect_timestamp=" << to_string(m_kinect_object_ptr->get_kinect_timestamp()) << endl;
+    header_stream << "kpclp_header_status=end" << endl;
+
+    header_stream.flush();
+    header_stream.close();
+
+    m_kinect_object_ptr->get_log() += "<- header_" + path_options + ": " + to_string(m_kinect_object_ptr->get_kinect_timestamp()) + "\n";
+
+    return 1;
+}
+
+string KinectInputOutput::write_depth_to_file()
+{
+    string output_path = m_output_path + "/depth_" + to_string(m_kinect_object_ptr->get_kinect_timestamp()) + ".bin";
+
+    ofstream depth_stream(output_path, ios::out | ios::binary);
 
     for(unsigned long i = 0; i < m_kinect_object_ptr->get_depth().size(); ++i)
     {
@@ -108,14 +132,16 @@ int KinectInputOutput::write_depth_to_file()
     depth_stream.flush();
     depth_stream.close();
 
-    m_kinect_object_ptr->get_log() += "<- depth: " + to_string(m_kinect_object_ptr->get_timestamp()) + "\n";
+    m_kinect_object_ptr->get_log() += "<- depth: " + to_string(m_kinect_object_ptr->get_kinect_timestamp()) + "\n";
 
-    return 1;
+    return output_path;
 }
 
-int KinectInputOutput::write_video_to_file()
+string KinectInputOutput::write_video_to_file()
 {
-    ofstream video_stream(m_output_path + "/video_" + to_string(m_kinect_object_ptr->get_timestamp()) + ".bin", ios::out | ios::binary);
+    string output_path = m_output_path + "/video_" + to_string(m_kinect_object_ptr->get_kinect_timestamp()) + ".bin";
+
+    ofstream video_stream(output_path, ios::out | ios::binary);
 
     for(unsigned long i = 0; i < m_kinect_object_ptr->get_video().size(); ++i)
     {
@@ -125,9 +151,9 @@ int KinectInputOutput::write_video_to_file()
     video_stream.flush();
     video_stream.close();
 
-    m_kinect_object_ptr->get_log() += "<- video: " + to_string(m_kinect_object_ptr->get_timestamp()) + "\n";
+    m_kinect_object_ptr->get_log() += "<- video: " + to_string(m_kinect_object_ptr->get_kinect_timestamp()) + "\n";
 
-    return 1;
+    return output_path;
 }
 
 int KinectInputOutput::destructor(bool hard)

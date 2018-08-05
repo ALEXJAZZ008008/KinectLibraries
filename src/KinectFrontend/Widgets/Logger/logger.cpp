@@ -51,9 +51,9 @@ int Logger::logger_kill(bool hard)
     return 1;
 }
 
-int Logger::print(const QString& string)
+int Logger::print(string &string)
 {
-    m_ui_ptr->_lbl_output_msg->insertPlainText(string);
+    m_ui_ptr->_lbl_output_msg->insertPlainText(string.c_str());
 
     m_ui_ptr->_lbl_output_msg->moveCursor(QTextCursor::End);
 
