@@ -64,13 +64,13 @@ public:
     }
 
     //! Gets logger ptr
-    inline Logger * get_logger_ptr()
+    inline KLLogger * get_logger_ptr()
     {
         return m_logger_ptr;
     }
 
     //! Sets logger ptr
-    inline int set_logger_ptr(Logger *logger_ptr)
+    inline int set_logger_ptr(KLLogger *logger_ptr)
     {
         m_logger_ptr = logger_ptr;
 
@@ -204,7 +204,7 @@ private:
     Ui::Konnector *m_ui_ptr;
 
     //! A window to display the log
-    Logger *m_logger_ptr;
+    KLLogger *m_logger_ptr;
 
     //! Pointer to the update timer
     QTimer *m_update_ptr;

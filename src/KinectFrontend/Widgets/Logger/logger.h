@@ -1,5 +1,5 @@
-#ifndef LOGGER_H
-#define LOGGER_H
+#ifndef KLLOGGER_H
+#define KLLOGGER_H
 
 #include <QWidget>
 
@@ -19,21 +19,21 @@ class Logger;
 //! This is a Qt widget for the KinectFrontend class.
 //! This class outputs logs to the screen
 //!
-class Logger : public QWidget
+class KLLogger : public QWidget
 {
 public:
 
     //! Constructor
-    explicit Logger(QWidget *parent = nullptr);
+    explicit KLLogger(QWidget *parent = nullptr);
 
     //! Destructor
-    ~Logger();
+    ~KLLogger();
 
     //! Copy and move constructos and assignment opperators,
-    Logger(Logger &);
-    Logger & operator = (Logger &);
-    Logger(Logger &&);
-    Logger & operator = (Logger &&);
+    KLLogger(KLLogger &);
+    KLLogger & operator = (KLLogger &);
+    KLLogger(KLLogger &&);
+    KLLogger & operator = (KLLogger &&);
 
     //! Gets the ui ptr
     inline Ui::Logger * get_ui_ptr()
@@ -71,4 +71,4 @@ private:
     int destructor(bool);
 };
 
-#endif // LOGGER_H
+#endif // KLLOGGER_H

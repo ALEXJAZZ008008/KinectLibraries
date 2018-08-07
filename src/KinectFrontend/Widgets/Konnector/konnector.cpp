@@ -3,7 +3,7 @@
 Konnector::Konnector(QDialog *parent):
     QDialog(parent),
     m_ui_ptr(new Ui::Konnector),
-    m_logger_ptr(new Logger(this)),
+    m_logger_ptr(new KLLogger(this)),
     m_update_ptr(new QTimer(this)),
     m_kinect_interface_ptr(new KinectInterface()),
     m_acquisition_start_time(),
