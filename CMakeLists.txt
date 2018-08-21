@@ -208,7 +208,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(src/include)
 
-if(Freenect_FOUND AND Freenect_2_FOUND)
+if(Freenect_FOUND)
 
     include(src/CMakeLists.txt)
 
