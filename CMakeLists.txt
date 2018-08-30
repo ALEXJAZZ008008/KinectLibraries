@@ -14,8 +14,8 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 option(DOWNLOAD_LibFreenect "Downlaod the Freenect libraries v.1" OFF)
 option(DOWNLOAD_LibFreenect2 "Downlaod the Freenect libraries v.2" OFF)
 
-option(LOCAL_LIBFREENECT "Use Local Freect libraries" OFF)
-option(LOCAL_LIBFREENECT_2 "Use Local Freect 2 libraries" OFF)
+option(LOCAL_LIBFREENECT "Use Local Freenect libraries" OFF)
+option(LOCAL_LIBFREENECT_2 "Use Local Freenect 2 libraries" OFF)
 
 option(BUILD_DOC "Build documentation" ON)
 
@@ -32,7 +32,7 @@ if(CMAKE_COMPILER_IS_GNUCC)
     add_definitions(-Wall -Wno-deprecated)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -std=gnu++0x -ffast-math")
 
-endif ()
+endif()
 
 if((${CMAKE_CXX_COMPILER_ID} MATCHES "AppleClang") OR (APPLE AND ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" AND ${CMAKE_CXX_COMPILER_ID} MATCHES "Clang"))
 
@@ -43,10 +43,10 @@ endif()
 # We need the LibFreenect libraries, either locally installed
 # or we will download them from git.
 
-if (NOT LOCAL_LIBFREENECT)
-    if(NOT DOWNLOAD_LibFreenect AND NOT DOWNLOAD_LibFreenect2)
+if(NOT LOCAL_LIBFREENECT)
+    if(NOT DOWNLOAD_LibFreenect)
 
-        message(STATUS "${PROJECT_NAME} depends on libfreenect. You must either have it installed locally or download them.")
+        message(STATUS "${PROJECT_NAME} depends on libfreenect. You must either have it installed locally or download it.")
 
     endif()
 else()
@@ -56,10 +56,10 @@ else()
 
 endif()
 
-if (NOT LOCAL_LIBFREENECT_2)
-    if(NOT DOWNLOAD_LibFreenect AND NOT DOWNLOAD_LibFreenect2)
+if(NOT LOCAL_LIBFREENECT_2)
+    if(NOT DOWNLOAD_LibFreenect2)
 
-        message(STATUS "${PROJECT_NAME} depends on libfreenect 2. You must either have it installed locally or download them.")
+        message(STATUS "${PROJECT_NAME} depends on libfreenect 2. You must either have it installed locally or download it.")
 
     endif()
 else()
@@ -140,7 +140,7 @@ if(DOWNLOAD_LibFreenect2)
 
     endif()
 
-    set(Freenect_2_LIBRARY "${Freenect_2_LIB_DIR}/${prefix}freenect${suffix}")
+    set(Freenect_2_LIBRARY "${Freenect_2_LIB_DIR}/${prefix}freenect2${suffix}")
     set(Freenect_2_FOUND ON)
 
 endif()
@@ -208,7 +208,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(src/include)
 
-if(Freenect_FOUND OR Freenect_2_FOUND)
+if(Freenect_FOUND)
 
     include(src/CMakeLists.txt)
 

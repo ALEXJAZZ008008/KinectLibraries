@@ -1,66 +1,66 @@
 #include "logger.h"
 #include "ui_logger.h"
 
-Logger::Logger(QWidget *parent) :
+KLLogger::KLLogger(QWidget *parent) :
     QWidget(parent),
     m_ui_ptr(new Ui::Logger())
 {
     m_ui_ptr->setupUi(this);
 }
 
-Logger::~Logger()
+KLLogger::~KLLogger()
 {
 
 }
 
-Logger::Logger(Logger &logger_ref):
+KLLogger::KLLogger(KLLogger &logger_ref):
     m_ui_ptr(logger_ref.get_ui_ptr())
 {
 
 }
 
-Logger & Logger::operator = (Logger &logger_ref)
+KLLogger & KLLogger::operator = (KLLogger &logger_ref)
 {
     m_ui_ptr = logger_ref.get_ui_ptr();
 
     return *this;
 }
 
-Logger::Logger(Logger &&logger_ref_ref):
+KLLogger::KLLogger(KLLogger &&logger_ref_ref):
     m_ui_ptr(logger_ref_ref.get_ui_ptr())
 {
 
 }
 
-Logger & Logger::operator = (Logger &&logger_ref_ref)
+KLLogger & KLLogger::operator = (KLLogger &&logger_ref_ref)
 {
     m_ui_ptr = logger_ref_ref.get_ui_ptr();
 
     return *this;
 }
 
-int Logger::logger_main()
+int KLLogger::logger_main()
 {
     return 1;
 }
 
-int Logger::logger_kill(bool hard)
+int KLLogger::logger_kill(bool hard)
 {
     destructor(hard);
 
     return 1;
 }
 
-int Logger::print(const QString& string)
+int KLLogger::print(string &string)
 {
-    m_ui_ptr->_lbl_output_msg->insertPlainText(string);
+    m_ui_ptr->_lbl_output_msg->insertPlainText(string.c_str());
 
     m_ui_ptr->_lbl_output_msg->moveCursor(QTextCursor::End);
 
     return 1;
 }
 
-int Logger::destructor(bool hard)
+int KLLogger::destructor(bool hard)
 {
     if(hard)
     {

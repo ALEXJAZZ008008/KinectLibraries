@@ -2,12 +2,14 @@
 #define KINECTBACKEND_H
 
 #include <memory>
+#include <chrono>
 #include <string>
 
 #include "libfreenect.h"
 #include "src/include/KinectObject.h"
 
 using namespace std;
+using namespace std::chrono;
 
 //!
 //! \class KinectBackend
@@ -86,20 +88,6 @@ public:
     inline int set_current_tilt_state_ptr(freenect_raw_tilt_state *current_tilt_state_ptr)
     {
         m_current_tilt_state_ptr = current_tilt_state_ptr;
-
-        return 1;
-    }
-
-    //! Gets resolution vector
-    inline vector<unsigned short> & get_resolution()
-    {
-        return m_resolution;
-    }
-
-    //! Sets resolution vector
-    inline int set_resolution(vector<unsigned short> &resolution)
-    {
-        m_resolution = resolution;
 
         return 1;
     }
@@ -253,9 +241,6 @@ private:
 
     //! Hold current tilt state.
     freenect_raw_tilt_state *m_current_tilt_state_ptr;
-
-    //! Holds the resolution that the kinect is set to
-    vector<unsigned short> m_resolution;
 
     //! Holds value which camera should be reset to
     double m_reset_camera_tilt;
