@@ -204,7 +204,7 @@ int Konnector::update_settings()
     }
     else
     {
-        m_kinect_interface_ptr->get_kinect_backend_ref().set_resolution_high_bool(true);
+        m_kinect_interface_ptr->get_kinect_backend_ref().set_resolution_high_bool(false);
     }
 
     return 1;
@@ -328,7 +328,14 @@ void Konnector::on_le_cur_tilt_returnPressed()
 {
     if(m_is_connected)
     {
-        KinectBackend::getInstance().set_current_camera_tilt_with_angle(m_ui_ptr->le_cur_tilt->text().toDouble());
+        bool *ok = new bool(false);
+
+        double angle = m_ui_ptr->le_cur_tilt->text().toDouble(ok);
+
+        if(*ok)
+        {
+            KinectBackend::getInstance().set_current_camera_tilt_with_angle(angle);
+        }
 
         emit camera_angle_changed();
     }

@@ -347,11 +347,11 @@ void KinectBackend::depth_callback(freenect_device *freenect_device_ptr, void *d
 
         KinectBackend::getInstance().m_kinect_object_ptr->set_epoch_timestamp(system_clock::now());
         KinectBackend::getInstance().m_kinect_object_ptr->set_kinect_timestamp(timestamp);
+
+        KinectBackend::getInstance().m_kinect_object_ptr->get_log() += "-> depth: " + to_string(timestamp) + "\n";
+
+        KinectBackend::getInstance().m_kinect_object_ptr->get_flags()[0] = true;
     }
-
-    KinectBackend::getInstance().m_kinect_object_ptr->get_log() += "-> depth: " + to_string(timestamp) + "\n";
-
-    KinectBackend::getInstance().m_kinect_object_ptr->get_flags()[0] = true;
 }
 
 void KinectBackend::video_callback(freenect_device *freenect_device_ptr, void *data_ptr, unsigned int timestamp)
@@ -372,11 +372,11 @@ void KinectBackend::video_callback(freenect_device *freenect_device_ptr, void *d
 
         KinectBackend::getInstance().m_kinect_object_ptr->set_epoch_timestamp(system_clock::now());
         KinectBackend::getInstance().m_kinect_object_ptr->set_kinect_timestamp(timestamp);
+
+        KinectBackend::getInstance().m_kinect_object_ptr->get_log() += "-> video: "  + to_string(timestamp) + "\n";
+
+        KinectBackend::getInstance().m_kinect_object_ptr->get_flags()[1] = true;
     }
-
-    KinectBackend::getInstance().m_kinect_object_ptr->get_log() += "-> video: "  + to_string(timestamp) + "\n";
-
-    KinectBackend::getInstance().m_kinect_object_ptr->get_flags()[1] = true;
 }
 
 int KinectBackend::update_tilt_state()

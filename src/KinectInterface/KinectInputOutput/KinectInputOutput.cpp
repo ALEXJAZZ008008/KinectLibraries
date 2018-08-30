@@ -73,7 +73,7 @@ int KinectInputOutput::kinect_input_output_main()
             }
         }
 
-        if(m_rgb_image_bool && m_kinect_object_ptr->get_flags()[1])
+        if(m_rgb_image_bool)
         {
             if(m_kinect_object_ptr->get_flags()[1])
             {
